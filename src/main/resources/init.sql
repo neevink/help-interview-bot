@@ -65,7 +65,7 @@ ALTER SEQUENCE tag_id_seq OWNED BY tag.id;
 
 CREATE TABLE if not exists "user"
 (
-    id        SERIAL PRIMARY KEY,
+    id        bigint PRIMARY KEY,
     is_banned BOOLEAN DEFAULT false NOT NULL,
     rating    INTEGER DEFAULT 0     NOT NULL
 );

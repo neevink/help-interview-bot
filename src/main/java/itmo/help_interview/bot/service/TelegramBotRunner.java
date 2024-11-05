@@ -1,6 +1,7 @@
 package itmo.help_interview.bot.service;
 
 import itmo.help_interview.bot.config.BotConfig;
+import itmo.help_interview.bot.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -13,6 +14,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 public class TelegramBotRunner extends TelegramLongPollingBot {
 
 	private final BotConfig botConfig;
+
+	private final UserRepository userRepository;
 
 	@Override
 	public String getBotUsername() {
@@ -41,7 +44,8 @@ public class TelegramBotRunner extends TelegramLongPollingBot {
 					sendMessage(chatId,
 							"Message text: " + messageText +
 							"\nYour name: " + userFirstName +
-							"\nYour chatId: " + chatId);
+							"\nYour chatId: " + chatId +
+							"All users = " + userRepository.findAll().stream().findFirst());
 			}
 		}
 
