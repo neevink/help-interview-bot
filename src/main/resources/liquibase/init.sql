@@ -15,14 +15,6 @@ CREATE TABLE if not exists question
     user_id       INTEGER               NOT NULL
 );
 
-CREATE SEQUENCE if not exists question_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE CACHE 1;
-ALTER SEQUENCE question_id_seq OWNED BY question.id;
-
 CREATE TABLE if not exists answer
 (
     id          SERIAL PRIMARY KEY,
@@ -30,15 +22,6 @@ CREATE TABLE if not exists answer
     text        TEXT                  NOT NULL,
     is_true     BOOLEAN DEFAULT false NOT NULL
 );
-
-CREATE SEQUENCE if not exists answer_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE CACHE 1;
-
-ALTER SEQUENCE answer_id_seq OWNED BY answer.id;
 
 
 CREATE TABLE if not exists question_tags
@@ -84,11 +67,3 @@ CREATE TABLE if not exists user_tags
     user_id INTEGER NOT NULL,
     tag_id  INTEGER NOT NULL
 );
-
-
-ALTER TABLE ONLY answer
-    ALTER COLUMN id SET DEFAULT nextval('answer_id_seq'::regclass);
-ALTER TABLE ONLY question
-    ALTER COLUMN id SET DEFAULT nextval('question_id_seq'::regclass);
-ALTER TABLE ONLY tag
-    ALTER COLUMN id SET DEFAULT nextval('tag_id_seq'::regclass);

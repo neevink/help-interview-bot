@@ -13,7 +13,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @RequiredArgsConstructor
 public class TelegramBotRunner extends TelegramLongPollingBot {
 
-
 	@Value("${bot.name}")
 	private String botName;
 
