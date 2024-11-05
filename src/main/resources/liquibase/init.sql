@@ -1,7 +1,7 @@
 -- Создание основных таблиц
 CREATE TYPE tag_category AS ENUM (
-    'Difficulty',
-    'Language');
+    'DIFFICULTY',
+    'LANGUAGE');
 
 CREATE TABLE if not exists question
 (

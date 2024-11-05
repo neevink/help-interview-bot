@@ -1,5 +1,6 @@
 package itmo.help_interview.bot.service;
 
+import itmo.help_interview.bot.repository.TagRepository;
 import itmo.help_interview.bot.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,7 @@ public class TelegramBotRunner extends TelegramLongPollingBot {
 	private String token;
 
 	private final UserRepository userRepository;
+	private final TagRepository tagRepository;
 
 	@Override
 	public String getBotUsername() {
@@ -49,7 +51,10 @@ public class TelegramBotRunner extends TelegramLongPollingBot {
 							"Message text: " + messageText +
 							"\nYour name: " + userFirstName +
 							"\nYour chatId: " + chatId +
-							"All users = " + userRepository.findAll().stream().findFirst());
+							"\nПервый юзер = " + userRepository.findAll().stream().findFirst().get() +
+							"\nПервый тег = " + tagRepository.findAll().stream().findFirst().get()
+
+					);
 			}
 		}
 
