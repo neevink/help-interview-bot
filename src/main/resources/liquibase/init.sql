@@ -46,7 +46,7 @@ CREATE SEQUENCE if not exists tag_id_seq
 
 ALTER SEQUENCE tag_id_seq OWNED BY tag.id;
 
-CREATE TABLE if not exists "user"
+CREATE TABLE if not exists bot_user
 (
     id        bigint PRIMARY KEY,
     is_banned BOOLEAN DEFAULT false NOT NULL,

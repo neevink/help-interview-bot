@@ -7,24 +7,20 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "user")
+@Table(name = "bot_user")
 public class User {
 	@Id
-	@NonNull
 	@Column(name = "id", nullable = false)
-	private Integer chatId;
+	private long chatId;
 
-	@NonNull
 	@Column(name = "is_banned", nullable = false)
-	private Boolean isBanned;
+	private boolean isBanned;
 
-	@NonNull
 	@Column(name = "rating", nullable = false)
-	private Integer firstName;
+	private long firstName;
 }
