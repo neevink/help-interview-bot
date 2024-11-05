@@ -1,8 +1,8 @@
 package itmo.help_interview.bot.service;
 
-import itmo.help_interview.bot.config.BotConfig;
 import itmo.help_interview.bot.repository.UserRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -10,21 +10,26 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TelegramBotRunner extends TelegramLongPollingBot {
 
-	private final BotConfig botConfig;
+
+	@Value("${bot.name}")
+	private String botName;
+
+	@Value("${bot.token}")
+	private String token;
 
 	private final UserRepository userRepository;
 
 	@Override
 	public String getBotUsername() {
-		return botConfig.getBotName();
+		return botName;
 	}
 
 	@Override
 	public String getBotToken() {
-		return botConfig.getToken();
+		return token;
 	}
 
 	@Override
