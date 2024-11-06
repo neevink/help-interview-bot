@@ -1,14 +1,15 @@
 package itmo.help_interview.bot.service.handlers.util;
 
 import itmo.help_interview.bot.entity.Question;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class NewQuestionContext {
-    Long chatId;
-
-    NewQuestionContextState state;
-
-    Question.QuestionBuilder questionBuilder;
-
-
-
+    private Long chatId;
+    private NewQuestionContextState state;
+    private Question question;
 }

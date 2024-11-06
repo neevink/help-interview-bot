@@ -1,17 +1,14 @@
 package itmo.help_interview.bot.service;
 
 import itmo.help_interview.bot.CommonUtil;
-import itmo.help_interview.bot.service.handlers.util.NewQuestionContextState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -24,8 +21,6 @@ public class TelegramBot extends TelegramLongPollingBot {
 	private String token;
 
 	private final HandleDispatcher handleDispatcher;
-	// TODO удалять контексты после всего процесса
-	private final Map<Long, NewQuestionContextState> userTONewQuestionContext = new HashMap<>();
 
 	@Override
 	public String getBotUsername() {
@@ -39,8 +34,6 @@ public class TelegramBot extends TelegramLongPollingBot {
 
 	@Override
 	public void onUpdateReceived(Update update) {
-
-
 		var isCommand = CommonUtil.extractText(update)
 				.map(CommonUtil::startsWithCommand)
 				.orElse(false);
@@ -66,6 +59,13 @@ public class TelegramBot extends TelegramLongPollingBot {
 	}
 
 	public void send(SendMessage sendMessage) {
+		try {
+			execute(sendMessage);
+		} catch (TelegramApiException ignored) {
+		}
+	}
+
+	public void send(EditMessageText sendMessage) {
 		try {
 			execute(sendMessage);
 		} catch (TelegramApiException ignored) {

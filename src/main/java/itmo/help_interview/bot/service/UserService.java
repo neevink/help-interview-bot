@@ -3,7 +3,6 @@ package itmo.help_interview.bot.service;
 
 import itmo.help_interview.bot.entity.Tag;
 import itmo.help_interview.bot.entity.User;
-import itmo.help_interview.bot.repository.TagRepository;
 import itmo.help_interview.bot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,7 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private TagRepository tagRepository;
+    private TagService tagService;
 
     @Transactional
     public void addTagToUser(Long userId, String tagName) {
@@ -29,7 +28,7 @@ public class UserService {
             User user = userOptional.get();
 
             // Ищем тег по имени или создаем новый
-            Tag tag = findOrCreateTagByName(tagName);
+            Tag tag = tagService.findTagByNameOrThrow(tagName);
 
             // Добавляем тег пользователю
             user.addTag(tag);
@@ -41,13 +40,4 @@ public class UserService {
         }
     }
 
-    private Tag findOrCreateTagByName(String tagName) {
-        // Ищем тег по имени
-        Optional<Tag> tagOptional = tagRepository.findByName(tagName);
-        if (tagOptional.isPresent()) {
-            return tagOptional.get();
-        } else {
-            throw new RuntimeException("Tag not found");
-        }
-    }
 }
