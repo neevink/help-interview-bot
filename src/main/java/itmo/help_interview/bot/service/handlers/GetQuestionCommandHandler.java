@@ -1,5 +1,6 @@
 package itmo.help_interview.bot.service.handlers;
 
+import itmo.help_interview.bot.repository.QuestionRepository;
 import itmo.help_interview.bot.repository.UserRepository;
 import itmo.help_interview.bot.service.CommandHandler;
 import itmo.help_interview.bot.service.TelegramBot;
@@ -14,7 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @RequiredArgsConstructor
 public class GetQuestionCommandHandler implements CommandHandler {
 
-	private final UserRepository userRepository;
+	private final QuestionRepository questionRepository;
 
 	@Override
 	public void handle(TelegramBot bot, Update update) {
@@ -24,7 +25,7 @@ public class GetQuestionCommandHandler implements CommandHandler {
 		var textToSend = "Message text: " + messageText +
 				"\nYour name: " + userFirstName +
 				"\nYour chatId: " + chatId +
-				"All users = " + userRepository.findAll().stream().findFirst();
+				"\nПервый вопрос = " + questionRepository.findAll().stream().findFirst();
 		bot.send(chatId, textToSend);
 	}
 
