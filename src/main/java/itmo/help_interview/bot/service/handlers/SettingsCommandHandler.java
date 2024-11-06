@@ -59,6 +59,7 @@ class SettingsCommandHandler implements CommandHandler {
         message.setText(answer);
         message.setReplyMarkup(inlineKeyboardMarkup);
 
+        // TODO: поменять на вызов bot.send(SendMessage message)
         try {
             bot.execute(message); // Убедитесь, что ваш метод bot.send() поддерживает отправку SendMessage с клавиатурой
         } catch (TelegramApiException e) {
@@ -111,7 +112,7 @@ class SettingsCommandHandler implements CommandHandler {
                 editMessage.setText(newText);
                 editMessage.setReplyMarkup(newKeyboard);
 
-                // Выполнение команды изменения сообщения
+                // TODO: поменять на вызов bot.send(SendMessage message)
                 try {
                     bot.execute(editMessage);
                 } catch (TelegramApiException e) {
@@ -124,9 +125,9 @@ class SettingsCommandHandler implements CommandHandler {
                 EditMessageText editMessageNew = new EditMessageText();
                 editMessageNew.setChatId(chatId);
                 editMessageNew.setMessageId(messageId);
-                editMessageNew.setText("Вы выбрали уровень: " + getPressedButtonFromCallbackData(callbackData) + " . Спасибо, ваши настройки сохранены.");
+                editMessageNew.setText("Вы выбрали уровень: " + getPressedButtonFromCallbackData(callbackData) + " . Спасибо, ваши настройки сохранены. Теперь введите команду /get_question, чтобы начать подготовку!");
 
-                // Выполнение изменения сообщения
+                // TODO: поменять на вызов bot.send(SendMessage message)
                 try {
                     bot.execute(editMessageNew);
                 } catch (TelegramApiException e) {

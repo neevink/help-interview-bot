@@ -47,10 +47,7 @@ public class UserService {
         if (tagOptional.isPresent()) {
             return tagOptional.get();
         } else {
-            // Создаем и сохраняем новый тег
-            Tag newTag = new Tag();
-            newTag.setName(tagName);
-            return tagRepository.save(newTag);
+            throw new RuntimeException("Tag not found");
         }
     }
 }
