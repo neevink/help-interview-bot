@@ -5,7 +5,7 @@ CREATE TYPE tag_category AS ENUM (
 
 CREATE TABLE if not exists question
 (
-    id            SERIAL PRIMARY KEY,
+    id            BIGSERIAL PRIMARY KEY,
     checked       BOOLEAN DEFAULT false NOT NULL,
     text          TEXT                  NOT NULL,
     is_open       BOOLEAN DEFAULT false NOT NULL,
@@ -53,13 +53,18 @@ CREATE TABLE if not exists bot_user
     rating    INTEGER DEFAULT 0     NOT NULL
 );
 
+CREATE TYPE user_answer_reaction AS ENUM (
+    'APPROVE',
+    'BLOCK',
+    'REPORT');
 
 CREATE TABLE if not exists user_answers
 (
-    user_id     INTEGER               NOT NULL,
-    question_id INTEGER               NOT NULL,
+    id          bigserial primary key,
+    user_id     bigint                NOT NULL,
+    question_id bigint                NOT NULL,
     is_true     BOOLEAN DEFAULT false NOT NULL,
-    text        TEXT                  NOT NULL
+    reaction    user_answer_reaction
 );
 
 CREATE TABLE if not exists user_tags

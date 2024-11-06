@@ -26,7 +26,7 @@ import java.util.List;
 public class Question {
 	@Id
 	@Column(name = "id", nullable = false)
-	private Integer id;
+	private Long id;
 
 	@Column(name = "text", nullable = false)
 	private String text;
