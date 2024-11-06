@@ -3,6 +3,7 @@ package itmo.help_interview.bot.service.handlers;
 import itmo.help_interview.bot.entity.Answer;
 import itmo.help_interview.bot.entity.Question;
 import itmo.help_interview.bot.entity.Tag;
+import itmo.help_interview.bot.exceptions.NotEvenSinglePotentialQuestionForUserException;
 import itmo.help_interview.bot.exceptions.SettingsNotDefinedYetException;
 import itmo.help_interview.bot.exceptions.UserNotFoundException;
 import itmo.help_interview.bot.repository.UserRepository;
@@ -44,7 +45,10 @@ public class GetQuestionCommandHandler implements CommandHandler {
 			bot.send(chatId, "Ошибка получения вопроса, попробуйте позже");
 			return;
 		} catch (SettingsNotDefinedYetException e) {
-			bot.send(chatId, "Ошибка получения вопроса, попробуйте позже");
+			bot.send(chatId, "Сначала Вам надо заполнить теги предпочтений");
+			return;
+		} catch (NotEvenSinglePotentialQuestionForUserException e) {
+			bot.send(chatId, e.getMessage());
 			return;
 		}
 
@@ -85,6 +89,13 @@ public class GetQuestionCommandHandler implements CommandHandler {
 
 		// Получение всех подходящих вопросов
 		List<Question> potentialQuestions = questionService.getAllQuestionsContainsBothTags(difficultUserTag, languageUserTag);
+		if (potentialQuestions.isEmpty()) {
+			// Не нашлось подходящих запросов, измените предпочтения
+			throw new NotEvenSinglePotentialQuestionForUserException(
+					"Для технологии " + languageUserTag.getName() +
+							" и сложности " + difficultUserTag.getName() +
+							" не нашлось вопросов для Вас");
+		}
 
 		// Выборка рандомного из них
 		// TODO: допилить сюда получение вопросов, на которые юзер ещё не отвечал верно
