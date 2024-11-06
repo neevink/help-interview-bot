@@ -10,14 +10,19 @@ CREATE TABLE if not exists question
     text          TEXT                  NOT NULL,
     is_open       BOOLEAN DEFAULT false NOT NULL,
     comment       TEXT,
-    created_at TIMESTAMP             NOT NULL,
+    creation_date TIMESTAMP             NOT NULL,
     is_deleted    BOOLEAN DEFAULT false NOT NULL,
-    user_id       INTEGER               NOT NULL,
-    right_answer TEXT NOT NULL,
-    b_answer TEXT NOT NULL,
-    c_answer TEXT NOT NULL,
-    d_answer TEXT NOT NULL
+    user_id       INTEGER               NOT NULL
 );
+
+CREATE TABLE if not exists answer
+(
+    id          SERIAL PRIMARY KEY,
+    question_id INTEGER               NOT NULL REFERENCES question (id) ON DELETE CASCADE,
+    text        TEXT                  NOT NULL,
+    is_true     BOOLEAN DEFAULT false NOT NULL
+);
+
 
 CREATE TABLE if not exists question_tags
 (
