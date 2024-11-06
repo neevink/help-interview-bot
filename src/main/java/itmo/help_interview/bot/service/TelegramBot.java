@@ -38,6 +38,8 @@ public class TelegramBot extends TelegramLongPollingBot {
 				.orElse(false);
 		if (isCommand) {
 			handleDispatcher.dispatchCommand(this, update);
+		} else if (update.hasCallbackQuery()) {
+			handleDispatcher.dispatchCallback(this, update);
 		} else {
 			// код не про команды надо будет поселить тут
 			throw new RuntimeException();
