@@ -1,5 +1,6 @@
 package itmo.help_interview.bot.service;
 
+import itmo.help_interview.bot.repository.QuestionRepository;
 import itmo.help_interview.bot.repository.TagRepository;
 import itmo.help_interview.bot.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class TelegramBotRunner extends TelegramLongPollingBot {
 
 	private final UserRepository userRepository;
 	private final TagRepository tagRepository;
+	private final QuestionRepository questionRepository;
 
 	@Override
 	public String getBotUsername() {
@@ -43,6 +45,11 @@ public class TelegramBotRunner extends TelegramLongPollingBot {
 			switch (messageText) {
 				case "/start":
 					startCommandReceived(chatId, userFirstName);
+					break;
+				case "/question":
+					System.out.println("get /question from " + userFirstName);
+					sendMessage(chatId,
+							"Random question: " + questionRepository.findAll().stream().findAny().get());
 					break;
 				default:
 					// Отправляем обратно сообщение
