@@ -12,7 +12,6 @@ import itmo.help_interview.bot.repository.TagRepository;
 import itmo.help_interview.bot.service.CommandHandler;
 import itmo.help_interview.bot.service.TagService;
 import itmo.help_interview.bot.service.TelegramBot;
-import itmo.help_interview.bot.service.UserService;
 import itmo.help_interview.bot.service.handlers.util.NewQuestionContext;
 import itmo.help_interview.bot.service.handlers.util.NewQuestionContextState;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 class AddQuestionCommandHandler implements CommandHandler {
 
     private final TagRepository tagRepository;
-    private final UserService userService;
 
     // TODO удалять контексты после всего процесса
     private final Map<Long, NewQuestionContext> userTONewQuestionContext = new HashMap<>();
@@ -73,7 +71,7 @@ class AddQuestionCommandHandler implements CommandHandler {
             List<InlineKeyboardButton> rowInline = new ArrayList<>();
             InlineKeyboardButton button = new InlineKeyboardButton();
             button.setText(tag.getName());
-            button.setCallbackData("/add_question_technology" + tag.getName()); // Используем текст тега в качестве callback data
+            button.setCallbackData("/add_question_technology_" + tag.getName()); // Используем текст тега в качестве callback data
             rowInline.add(button);
             rowsInline.add(rowInline);
         }
@@ -153,7 +151,7 @@ class AddQuestionCommandHandler implements CommandHandler {
                 editMessageNew.setMessageId(messageId);
                 editMessageNew.setText("Вы выбрали технологию: " + question.getTags().get(0).getName() +
                         "\nВы выбрали уровень вопроса: " + difficultyTagPressed +
-                        "\n\nТеперь введите *текст вопроса* одним сообщением ниже");
+                        "\n\nТеперь введите текст вопроса одним сообщением ниже");
 
                 bot.send(editMessageNew);
                 break;

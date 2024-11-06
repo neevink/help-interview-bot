@@ -43,6 +43,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 			handleDispatcher.dispatchCallback(this, update);
 		} else {
 			// проверяем ожидается ли сообщение от пользователя по контексту и если да то переход в обработку
+
 			// код не про команды надо будет поселить тут
 			throw new RuntimeException();
 		}
