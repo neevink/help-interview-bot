@@ -37,4 +37,8 @@ public class User {
 			inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id")
 	)
 	private List<Tag> tags;
+
+	public void addTag(Tag tag) {
+		tags.add(tag);
+	}
 }
