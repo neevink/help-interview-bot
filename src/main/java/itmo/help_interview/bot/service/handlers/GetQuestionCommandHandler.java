@@ -40,7 +40,6 @@ public class GetQuestionCommandHandler implements CommandHandler {
     private final QuestionService questionService;
 
     private static Random rnd = new Random(42);
-    private final QuestionRepository questionRepository;
 
     @Override
     public void handle(TelegramBot bot, Update update) {
@@ -147,6 +146,7 @@ public class GetQuestionCommandHandler implements CommandHandler {
         // Меняем старое сообщение чтобы нельзя было на него снова ответить
         EditMessageText editMessageNew = new EditMessageText();
         editMessageNew.setChatId(chatId);
+        editMessageNew.setText("EDITED???");
         editMessageNew.setMessageId(messageId);
         editMessageNew.setReplyMarkup(null);
 
