@@ -1,6 +1,6 @@
 package itmo.help_interview.bot.config;
 
-import itmo.help_interview.bot.service.TelegramBotRunner;
+import itmo.help_interview.bot.service.TelegramBot;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -11,9 +11,9 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 @Component
 public class BotInitializer {
 
-	private final TelegramBotRunner telegramBot;
+	private final TelegramBot telegramBot;
 
-	public BotInitializer(TelegramBotRunner telegramBot) {
+	public BotInitializer(TelegramBot telegramBot) {
 		this.telegramBot = telegramBot;
 	}
 
@@ -22,8 +22,7 @@ public class BotInitializer {
 		TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
 		try {
 			telegramBotsApi.registerBot(telegramBot);
-		} catch (TelegramApiException e) {
-
+		} catch (TelegramApiException ignored) {
 		}
 	}
 }
