@@ -83,12 +83,7 @@ CREATE TABLE if not exists user_tags
 (
     user_id INTEGER NOT NULL,
     tag_id  INTEGER NOT NULL
-);
-
-
---заполнение основных таблиц
-
-INSERT INTO bot_user (id, is_banned, rating)
+);INSERT INTO bot_user (id, is_banned, rating)
 VALUES (all_author_id, false, 100);
 
 INSERT INTO tag (id, category, name)
@@ -129,523 +124,319 @@ values (1, all_author_id, 1, true, 'APPROVE'),
        (3, all_author_id, 3, false, 'BLOCK');
 
 
---заполение таблицы вопросов
-
-
 --4 Python Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
 VALUES (4, true, 'Выберите верные утверждения о языке программирования Python', false, NULL, now(), false, all_author_id);
 
-INSERT INTO answer (id, question_id, text, is_true)
-VALUES 	(5, 4, 'высокоуровневый', true),
-	(6, 4, 'низкоуровневый', false),
-	(7, 4, 'интерпретируемый', true),
-	(8, 4, 'компилируемый', false);
+INSERT INTO answer  (id, question_id, text, is_true)
+VALUES (7, 4, 'высокоуровневый', true),
+       (8, 4, 'низкоуровневый', false),
+       (9, 4, 'интерпретируемый', true),
+       (10, 4, 'компилируемый', false);
 
 INSERT INTO question_tags (question_id, tag_id)
 VALUES (4, 1),
        (4, 6);
 
 
-
 --5 Python Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (5, true, 'Обязательно ли в Пайтоне объявлять тип переменной?', false, NULL, now(), false, all_author_id);
+VALUES (5, true, 'Обязательно ли в Пайтоне объявлять тип переменной?', false, 'В Python не обязательно объявлять тип переменной. Python является языком с динамической типизацией, что означает, что переменные определяются автоматически на основе их значения при присваивании. Это позволяет избежать явного объявления типа переменной и упрощает код.', now(), false, all_author_id);
 
-INSERT INTO answer (id, question_id, text, is_true)
-VALUES 	(9, 5, 'Да', false),
-	(10, 5, 'Нет', true);
+INSERT INTO answer  (id, question_id, text, is_true)
+VALUES (11, 5, 'Да', false),
+       (12, 5, 'Нет', true);
 
 INSERT INTO question_tags (question_id, tag_id)
 VALUES (5, 1),
        (5, 6);
 
 
-
-
-
 --6 Python Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (6, true, 'Какие из представленных фрагментов кода являются литералами?', false, NULL, now(), false, all_author_id);
+VALUES (6, true, 'Какие из представленных фрагментов кода являются литералами?', false,  '  ''#'' являеется строковым литералом,  0.77 - числовым литералом, [1, 2] - литералом списка.
+5**2 - выражение, а не литерал.', now(), false, all_author_id);
 
-INSERT INTO answer (id, question_id, text, is_true)
-VALUES 	(11, 6, '''#''', true),
-	(12, 6, '0.77', true),
-        (13, 6, '5**2', false),
-        (14, 6, '[1, 2]', true);
+INSERT INTO answer  (id, question_id, text, is_true)
+VALUES (13, 6, '  ''#'' ', true),
+       (14, 6, '5**2', false),
+       (15, 6, '[1, 2]', true),
+       (16, 6, '0.77', true);
 
 INSERT INTO question_tags (question_id, tag_id)
 VALUES (6, 1),
        (6, 6);
 
 
-
-
 --7 Python Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (7, true, 'Какие из предлагаемых имен допустимы в Python?', false, NULL, now(), false, all_author_id);
+VALUES (7, true, 'Какие из предлагаемых имен допустимы в Python?', false, ' В Python допустимы имена переменных, которые соответствуют следующим правилам: 
+Имя переменной должно начинаться с буквы или символа подчёркивания (_). 
+Последующие символы могут быть буквами, цифрами или символами подчёркивания.
+Имена переменных чувствительны к регистру. Например, a и A — это разные переменные.
+В качестве имён переменных нельзя использовать ключевые слова Python (например, if, for, while и т. д.).', now(), false, all_author_id);
 
-INSERT INTO answer (id, question_id, text, is_true)
-VALUES 	(15, 7, 's_5', true),
-	(16, 7, '_5s', false),
-        (17, 7, '5_s', false),
-        (18, 7, 'Щ5', false);
+INSERT INTO answer  (id, question_id, text, is_true)
+VALUES (17, 7, ' s_5 ', true),
+       (18, 7, '_5s', false),
+       (19, 7, '5_s', false),
+       (20, 7, 'Щ5', false);
 
 INSERT INTO question_tags (question_id, tag_id)
 VALUES (7, 1),
        (7, 6);
 
 
-
-
 --8 Python Java C++ Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
 VALUES (8, true, 'Как будет выглядеть имя переменной в верблюжьей нотации при использовании фразы «show must go on»?', false, NULL, now(), false, all_author_id);
 
-INSERT INTO answer (id, question_id, text, is_true)
-VALUES 	(19, 8, 'ShowMustGoOn', false),
-	(20, 8, 'show_must_go_on', false),
-        (21, 8, 'showMustGoOn', true),
-        (22, 8, 'SHOW_MUST_GO_ON', false);
+INSERT INTO answer  (id, question_id, text, is_true)
+VALUES (21, 8, 'showMustGoOn', true),
+       (22, 8, 'ShowMustGoOn', false),
+       (23, 8, 'show_must_go_on', false),
+       (24, 8, 'SHOW_MUST_GO_ON', false);
 
 INSERT INTO question_tags (question_id, tag_id)
 VALUES (8, 1),
-       (8, 6),
        (8, 4),
-       (8, 5);
+       (8, 5),
+       (8, 6);
 
 
-
---9 Python Junior
+--9 Python Java C++ Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (9, true, 'Что по умолчанию служит концом инструкции в Python? ', false, NULL, now(), false, all_author_id);
+VALUES (9, true, 'Что по умолчанию служит концом инструкции в Python?', false, NULL, now(), false, all_author_id);
 
-INSERT INTO answer (id, question_id, text, is_true)
-VALUES 	(23, 9, 'конец строки', true),
-	(24, 9, 'запятая', false),
-        (25, 9, 'точка', false),
-        (26, 9, 'точка с запятой', false);
+INSERT INTO answer  (id, question_id, text, is_true)
+VALUES (25, 9, 'конец строки', true),
+       (26, 9, 'запятая', false),
+       (27, 9, 'точка', false),
+       (28, 9, 'точка с запятой', false);
 
 INSERT INTO question_tags (question_id, tag_id)
 VALUES (9, 1),
        (9, 6);
 
 
-
-
---10 Python Junior
+--10 Python Middle
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (10, true, 'Для выделения блоков кода одного уровня вложенности в Питоне используются...', false, NULL, now(), false, all_author_id);
-
-INSERT INTO answer (id, question_id, text, is_true)
-VALUES 	(27, 10, 'круглые скобки', false),
-	(28, 10, 'квадратные скобки', false),
-        (29, 10, 'фигурные скобки', false),
-        (30, 10, 'идентичные отступы', true);
+VALUES (10, true, 'Для чего могут применять конструкцию try finally без except', true,  ' Если в блоке try произойдет ошибка, то блок finally все-равно будет выполнен и внутри него можно будет сделать "cleanup", например. ' , now(), false, all_author_id);
 
 INSERT INTO question_tags (question_id, tag_id)
-VALUES (10, 1),
+VALUES (10, 2),
        (10, 6);
 
 
-
-
-
-
---11 Python Junior
+--11 Python Senior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (11, true, 'Какие из представленных символов или их комбинаций используются в Python для комментирования кода?', false, NULL, now(), false, all_author_id);
-
-INSERT INTO answer (id, question_id, text, is_true)
-VALUES 	(31, 11, '#', true),
-	(32, 11, '//', false),
-        (33, 11, '<!-- -->', false),
-        (34, 11, '/* */', false);
+VALUES (11, true, 'Что такое сцепление исключений', true,  ' В Python 3 при возбуждении исключения в блоке except, старое исключение сохраняется в атрибуте данных __context__ и если новое исключение не обработано, то будет выведена информация о том, что новое исключение возникло при обработке старого ' , now(), false, all_author_id);
 
 INSERT INTO question_tags (question_id, tag_id)
-VALUES (11, 1),
+VALUES (11, 3),
        (11, 6);
 
 
-
-
---12 Python Java C++ Junior
+--12 Python Senior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (12, true, 'Чем отличаются операторы = и ==?', false, NULL, now(), false, all_author_id);
-
-INSERT INTO answer (id, question_id, text, is_true)
-VALUES 	(35, 12, 'операторы эквивалентны', false),
-	(36, 12, 'оператор = менее точный', false),
-        (37, 12, 'оператор = присваивает значения, а == сравнивает их', true);
+VALUES (12, true, 'Какие есть классы исключений', true,  ' BaseException, Exception, ArithmeticError, BufferError, LookupError ' , now(), false, all_author_id);
 
 INSERT INTO question_tags (question_id, tag_id)
-VALUES (12, 1),
-       (12, 6),
-       (12, 4),
-       (12, 5);
+VALUES (12, 3),
+       (12, 6);
 
 
-
-
---13 Python Junior
+--13 Python Middle
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (13, true, 'Какие из представленных символов или их комбинаций используются в Python для комментирования кода?', false, NULL, now(), false, all_author_id);
-
-INSERT INTO answer (id, question_id, text, is_true)
-VALUES 	(38, 13, 'end', false),
-	(39, 13, 'sep', true),
-        (40, 13, 'вывод в столбик невозможен', false),
-        (41, 13, 'значения аргументов и так всегда выводятся с новой строки', false);
+VALUES (13, true, 'Что может быть декоратором. К чему может быть применен декоратор', true,  ' Декоратором может быть любой вызываемый объект: функция, лямбда, класс, экземпляр класса. В последнем случае определите метод __call__. 
+Применять декоратор можно к любому объекту. Чаще всего к функциям, методам и классам. Декорирование встречается настолько часто, что под него выделен особый оператор @. ' , now(), false, all_author_id);
 
 INSERT INTO question_tags (question_id, tag_id)
-VALUES (13, 1),
+VALUES (13, 2),
        (13, 6);
 
 
-
-
---14 Python Junior
+--14 Java Python Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (14, true, 'Данные какого типа возвращает встроенная функция input()? ', false, NULL, now(), false, all_author_id);
+VALUES (14, true, 'Как называется код между фигурными скобками?', false, NULL, now(), false, all_author_id);
 
-INSERT INTO answer (id, question_id, text, is_true)
-VALUES 	(42, 14, 'логический тип', false),
-	(43, 14, 'строка', true),
-        (44, 14, 'целое число', false),
-        (45, 14, 'вещественное число', false);
+INSERT INTO answer  (id, question_id, text, is_true)
+VALUES (29, 14, 'функция', false),
+       (30, 14, 'секция', false),
+       (31, 14, 'тело', false),
+       (32, 14, 'блок', true);
 
 INSERT INTO question_tags (question_id, tag_id)
 VALUES (14, 1),
+       (14, 4),
        (14, 6);
 
 
-
-
-
---15 Python Junior Middle
+--15 Java Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (15, true, 'Какой стиль именования классов рекомендуется в руководстве PEP 8 по оформлению кода на Python?', false, NULL, now(), false, all_author_id);
+VALUES (15, true, 'Каково значение arr[1].length в следующем массиве?
+int[][] arr = { {1, 2, 3, 4, 5}, { 6, 7, 8, 9, 10} };', false,  ' Будет посчитана длина второго массива. ' , now(), false, all_author_id);
 
-INSERT INTO answer (id, question_id, text, is_true)
-VALUES 	(46, 15, 'camelCase', false),
-	(47, 15, 'CapWords', true),
-        (48, 15, 'snake_case', false),
-        (49, 15, 'ALL_CAPS', false);
+INSERT INTO answer  (id, question_id, text, is_true)
+VALUES (33, 15, '5', true),
+       (34, 15, '10', false),
+       (35, 15, '1', false),
+       (36, 15, '2', false);
 
 INSERT INTO question_tags (question_id, tag_id)
 VALUES (15, 1),
-       (15, 6),
-       (15, 2);
+       (15, 4);
 
 
-
-
---16 Python Middle
+--16 Java Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (16, true, 'Что такое замыкание?', true, NULL, now(), false, all_author_id);
-
-
-INSERT INTO question_tags (question_id, tag_id)
-VALUES (16, 6),
-       (16, 2);
-
-
-
---17 Python Middle
-INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (17, true, 'Что такое итератор?', true, NULL, now(), false, all_author_id);
-
-
-INSERT INTO question_tags (question_id, tag_id)
-VALUES (17, 6),
-       (17, 2);
-
-
-
-
---18 Python Middle
-INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (18, true, 'Что такое генераторная функция?', true, NULL, now(), false, all_author_id);
-
-
-INSERT INTO question_tags (question_id, tag_id)
-VALUES (18, 6),
-       (18, 2);
-
-
-
---19 Python Middle
-INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (19, true, 'Что возвращает итерация по словарю?', true, NULL, now(), false, all_author_id);
-
-
-INSERT INTO question_tags (question_id, tag_id)
-VALUES (19, 6),
-       (19, 2);
-
-
-
---20 Python Middle
-INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (20, true, 'Что такое магические методы, для чего нужны?', true, NULL, now(), false, all_author_id);
-
-
-INSERT INTO question_tags (question_id, tag_id)
-VALUES (20, 6),
-       (20, 2);
-
-
-
---21 Python Middle
-INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (21, true, 'Что такое контекстный менеджер? Как написать свой?', true, NULL, now(), false, all_author_id);
-
-
-INSERT INTO question_tags (question_id, tag_id)
-VALUES (21, 6),
-       (21, 2);
-
-
-
---22 Python Middle
-INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (22, true, 'Что такое __slots__. Плюсы, минусы', true, NULL, now(), false, all_author_id);
-
-
-INSERT INTO question_tags (question_id, tag_id)
-VALUES (22, 6),
-       (22, 2);
-
-
-
---23 Python Middle
-INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (23, true, 'В чем смысл параметров _value, __value', true, NULL, now(), false, all_author_id);
-
-
-INSERT INTO question_tags (question_id, tag_id)
-VALUES (23, 6),
-       (23, 2);
-
-
---24 Python Middle
-INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (24, true, 'Для чего могут применять конструкцию try finally без except', true, NULL, now(), false, all_author_id);
-
-INSERT INTO question_tags (question_id, tag_id)
-VALUES (24, 2),
-       (24, 6);
-
-
---25 Python Senior
-INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (25, true, 'Что такое сцепление исключений', true, NULL, now(), false, all_author_id);
-
-INSERT INTO question_tags (question_id, tag_id)
-VALUES (25, 3),
-       (25, 6);
-
-
---26 Python Senior
-INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (26, true, 'Какие есть классы исключений', true, NULL, now(), false, all_author_id);
-
-INSERT INTO question_tags (question_id, tag_id)
-VALUES (26, 3),
-       (26, 6);
-
-
---27 Python Middle
-INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (27, true, 'Что может быть декоратором. К чему может быть применен декоратор', true, NULL, now(), false, all_author_id);
-
-INSERT INTO question_tags (question_id, tag_id)
-VALUES (27, 2),
-       (27, 6);
-
-
---28 Java Python Junior
-INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (28, true, 'Как называется код между фигурными скобками?', false, NULL, now(), false, all_author_id);
+VALUES (16, true, 'В чем разница между char и Character?', false, NULL, now(), false, all_author_id);
 
 INSERT INTO answer  (id, question_id, text, is_true)
-VALUES (50, 28, 'функция', false),
-       (51, 28, 'секция', false),
-       (52, 28, 'тело', false),
-       (53, 28, 'блок', true);
+VALUES (37, 16, 'char является примитивным типом, а Character классом.', true),
+       (38, 16, 'нет разницы, они оба примитивные типы', false),
+       (39, 16, 'char является классом, а Character примитивным типом.', false),
+       (40, 16, 'нет разницы, они оба классы.', false);
 
 INSERT INTO question_tags (question_id, tag_id)
-VALUES (28, 1),
-       (28, 4),
-       (28, 6);
+VALUES (16, 1),
+       (16, 4);
 
 
---29 Java Junior
+--17 Java Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (29, true, 'Каково значение arr[1].length в следующем массиве?
-int[][] arr = { {1, 2, 3, 4, 5}, { 6, 7, 8, 9, 10} };', false, NULL, now(), false, all_author_id);
+VALUES (17, true, 'Какие из этих операторов можно использовать для объединения двух или более объектов String?', false, NULL, now(), false, all_author_id);
 
 INSERT INTO answer  (id, question_id, text, is_true)
-VALUES (54, 29, '5', true),
-       (55, 29, '10', false),
-       (56, 29, '1', false),
-       (57, 29, '2', false);
+VALUES (41, 17, '+', true),
+       (42, 17, '*=', false),
+       (43, 17, '+=', false),
+       (44, 17, '*', false);
 
 INSERT INTO question_tags (question_id, tag_id)
-VALUES (29, 1),
-       (29, 4);
+VALUES (17, 1),
+       (17, 4);
 
 
---30 Java Junior
+--18 Java Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (30, true, 'В чем разница между char и Character?', false, NULL, now(), false, all_author_id);
+VALUES (18, true, 'От какого класса наследуют все классы Java?', false, NULL, now(), false, all_author_id);
 
 INSERT INTO answer  (id, question_id, text, is_true)
-VALUES (58, 30, 'char является примитивным типом, а Character классом.', true),
-       (59, 30, 'нет разницы, они оба примитивные типы', false),
-       (60, 30, 'char является классом, а Character примитивным типом.', false),
-       (61, 30, 'нет разницы, они оба классы.', false);
+VALUES (45, 18, 'Object', true),
+       (46, 18, 'List', false),
+       (47, 18, 'Runtime', false),
+       (48, 18, 'Collection', false);
 
 INSERT INTO question_tags (question_id, tag_id)
-VALUES (30, 1),
-       (30, 4);
+VALUES (18, 1),
+       (18, 4);
 
 
---31 Java Junior
+--19 Java Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (31, true, 'Какие из этих операторов можно использовать для объединения двух или более объектов String?', false, NULL, now(), false, all_author_id);
+VALUES (19, true, 'Укажите допустимый синтаксис комментария.', false, NULL, now(), false, all_author_id);
 
 INSERT INTO answer  (id, question_id, text, is_true)
-VALUES (62, 31, '+', true),
-       (63, 31, '*=', false),
-       (64, 31, '+=', false),
-       (65, 31, '*', false);
+VALUES (49, 19, ' /* Комментарий */', true),
+       (50, 19, ' # Комментарий', false),
+       (51, 19, ' /* Комментарий', false),
+       (52, 19, '// Комментарий', true);
 
 INSERT INTO question_tags (question_id, tag_id)
-VALUES (31, 1),
-       (31, 4);
+VALUES (19, 1),
+       (19, 4);
 
 
---32 Java Junior
+--20 Java Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (32, true, 'От какого класса наследуют все классы Java?', false, NULL, now(), false, all_author_id);
+VALUES (20, true, 'Укажите допустимый тип данных.', false,  ' unknown - не тип, Double - класс, а не тип ' , now(), false, all_author_id);
 
 INSERT INTO answer  (id, question_id, text, is_true)
-VALUES (66, 32, 'Object', true),
-       (67, 32, 'List', false),
-       (68, 32, 'Runtime', false),
-       (69, 32, 'Collection', false);
+VALUES (53, 20, 'int', false),
+       (54, 20, 'float', false),
+       (55, 20, 'string', true),
+       (56, 20, 'unknown', true),
+       (57, 20, 'Double', false);
 
 INSERT INTO question_tags (question_id, tag_id)
-VALUES (32, 1),
-       (32, 4);
+VALUES (20, 1),
+       (20, 4);
 
 
---33 Java Junior
+--21 Java Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (33, true, 'Укажите допустимый синтаксис комментария.', false, NULL, now(), false, all_author_id);
+VALUES (21, true, 'Можно ли создать программу (приложение) на Java, не используя среду разработки (IDE)?', false, NULL, now(), false, all_author_id);
 
 INSERT INTO answer  (id, question_id, text, is_true)
-VALUES (70, 33, ' /* Комментарий */', true),
-       (71, 33, ' # Комментарий', false),
-       (72, 33, ' /* Комментарий', false),
-       (73, 33, '// Комментарий', true);
+VALUES (58, 21, 'Да', true),
+       (59, 21, 'Нет, так как необходимо скомпилировать исходный код в байт-код', false);
 
 INSERT INTO question_tags (question_id, tag_id)
-VALUES (33, 1),
-       (33, 4);
+VALUES (21, 1),
+       (21, 4);
 
 
---34 Java Junior
+--22 Java Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (34, true, 'Укажите допустимый синтаксис комментария.', false, NULL, now(), false, all_author_id);
+VALUES (22, true, 'Какое расширение имеют файлы с исходным кодом Java?', false, NULL, now(), false, all_author_id);
 
 INSERT INTO answer  (id, question_id, text, is_true)
-VALUES (74, 34, 'int', false),
-       (75, 34, 'float', false),
-       (76, 34, 'string', true),
-       (77, 34, 'unknown', true),
-       (78, 34, 'Double', false);
+VALUES (60, 22, 'javac', false),
+       (61, 22, 'java', true),
+       (62, 22, 'class', false),
+       (63, 22, 'classpath', false);
 
 INSERT INTO question_tags (question_id, tag_id)
-VALUES (34, 1),
-       (34, 4);
+VALUES (22, 1),
+       (22, 4);
 
 
---35 Java Junior
+--23 Java Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (35, true, 'Можно ли создать программу (приложение) на Java, не используя среду разработки (IDE)?', false, NULL, now(), false, all_author_id);
+VALUES (23, true, 'Может ли файл содержать более одного класса Java?', false, NULL, now(), false, all_author_id);
 
 INSERT INTO answer  (id, question_id, text, is_true)
-VALUES (79, 35, 'Да', true),
-       (80, 35, 'Нет, так как необходимо скомпилировать исходный код в байт-код', false);
+VALUES (64, 23, 'Да, но только если один внешний класс имеет модификатор доступа public', true),
+       (65, 23, 'Да, если все внешние классы будут иметь модификатор доступа private', false),
+       (66, 23, 'Нет', false);
 
 INSERT INTO question_tags (question_id, tag_id)
-VALUES (35, 1),
-       (35, 4);
+VALUES (23, 1),
+       (23, 4);
 
 
---36 Java Junior
+--24 Java Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (36, true, 'Какое расширение имеют файлы с исходным кодом Java?', false, NULL, now(), false, all_author_id);
+VALUES (24, true, 'Какое имя переменной является синтаксически недопустимым?', false,  ' Имя переменной должно начинаться с буквы латинского алфавита или знака подчёркивания, и состоять из букв латинского алфавита, знака подчёркивания и цифр. ' , now(), false, all_author_id);
 
 INSERT INTO answer  (id, question_id, text, is_true)
-VALUES (81, 36, 'javac', false),
-       (82, 36, 'java', true),
-       (83, 36, 'class', false),
-       (84, 36, 'classpath', false);
+VALUES (67, 24, '53someVariable', true),
+       (68, 24, '_someVariable', false),
+       (69, 24, ' some-variable', true),
+       (70, 24, 'somevariable', false),
+       (71, 24, 'someVariable', false),
+       (72, 24, 'Somevariable53', false),
+       (73, 24, '_53someVariable', false);
 
 INSERT INTO question_tags (question_id, tag_id)
-VALUES (36, 1),
-       (36, 4);
+VALUES (24, 1),
+       (24, 4);
 
 
---37 Java Junior
+--25 Java Junior
 INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (37, true, 'Может ли файл содержать более одного класса Java?', false, NULL, now(), false, all_author_id);
+VALUES (25, true, 'Импорт какого пакета в Java происходит автоматически?', false, NULL, now(), false, all_author_id);
 
 INSERT INTO answer  (id, question_id, text, is_true)
-VALUES (85, 37, 'Да, но только если один внешний класс имеет модификатор доступа public', true),
-       (86, 37, 'Да, если все внешние классы будут иметь модификатор доступа private', false),
-       (87, 37, 'Нет', false);
+VALUES (74, 25, 'Все пакеты нужно явно указывать', false),
+       (75, 25, 'java.util', false),
+       (76, 25, 'java.lang', true),
+       (77, 25, 'java.text', false);
 
 INSERT INTO question_tags (question_id, tag_id)
-VALUES (37, 1),
-       (37, 4);
-
-
---38 Java Junior
-INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (38, true, 'Какое имя переменной является синтаксически недопустимым?', false, NULL, now(), false, all_author_id);
-
-INSERT INTO answer  (id, question_id, text, is_true)
-VALUES (88, 38, '53someVariable', true),
-       (89, 38, '_someVariable', false),
-       (90, 38, ' some-variable', true),
-       (91, 38, 'somevariable', false),
-       (92, 38, 'someVariable', false),
-       (93, 38, 'Somevariable53', false),
-       (94, 38, '_53someVariable', false);
-
-INSERT INTO question_tags (question_id, tag_id)
-VALUES (38, 1),
-       (38, 4);
-
-
---39 Java Junior
-INSERT INTO question (id, checked, text, is_open, comment, creation_date, is_deleted, user_id)
-VALUES (39, true, 'Импорт какого пакета в Java происходит автоматически?', false, NULL, now(), false, all_author_id);
-
-INSERT INTO answer  (id, question_id, text, is_true)
-VALUES (95, 39, 'Все пакеты нужно явно указывать', false),
-       (96, 39, 'java.util', false),
-       (97, 39, 'java.lang', true),
-       (98, 39, 'java.text', false);
-
-INSERT INTO question_tags (question_id, tag_id)
-VALUES (39, 1),
-       (39, 4);
-
+VALUES (25, 1),
+       (25, 4);
 
 
 END; $$ LANGUAGE plpgsql;
