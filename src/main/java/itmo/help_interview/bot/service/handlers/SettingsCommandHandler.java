@@ -22,7 +22,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-class SettingsCommandHandler implements CommandHandler {
+public class SettingsCommandHandler implements CommandHandler {
     private final TagRepository tagRepository;
     private final UserService userService;
 

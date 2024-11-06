@@ -25,7 +25,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 @Component
 @RequiredArgsConstructor
-class AddQuestionCommandHandler implements CommandHandler {
+public class AddQuestionCommandHandler implements CommandHandler {
 
     private final TagRepository tagRepository;
 
