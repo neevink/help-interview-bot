@@ -93,6 +93,11 @@ public class GetQuestionCommandHandler implements CommandHandler {
 	}
 
 	@Override
+	public void handleCallback(TelegramBot bot, Update update) {
+
+	}
+
+	@Override
 	public String getCommandName() {
 		return "/get_question";
 	}

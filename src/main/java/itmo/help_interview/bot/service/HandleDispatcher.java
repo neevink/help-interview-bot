@@ -29,4 +29,13 @@ public class HandleDispatcher {
                 .orElse(defaultCommandHandler)
                 .handle(bot, update);
     }
+
+    public void dispatchCallback(TelegramBot bot, Update update) {
+        String callbackData = update.getCallbackQuery().getData();
+        for (String handlerName : handlers.keySet()){
+            if (callbackData.startsWith(handlerName)){
+                handlers.get(handlerName).handleCallback(bot, update);
+            }
+        }
+    }
 }
