@@ -21,4 +21,9 @@ public class QuestionService {
 				.toList();
 	}
 
+	public Question getQuestionById(Long id) {
+		return questionRepository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("Question not found"));
+	}
+
 }
