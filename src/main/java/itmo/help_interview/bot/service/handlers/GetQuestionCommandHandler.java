@@ -13,8 +13,13 @@ import itmo.help_interview.bot.service.TagService;
 import itmo.help_interview.bot.service.TelegramBot;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -61,9 +66,30 @@ public class GetQuestionCommandHandler implements CommandHandler {
 			textToSend.append(i).append(". ").append(current.getText()).append("\n");
 		}
 
+		InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+		List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+
+		for (int i = 0; i < answers.size(); i++) {
+			InlineKeyboardButton button = new InlineKeyboardButton();
+			button.setText(String.valueOf(i + 1)); // Текст кнопки (например, "1", "2" и т.д.)
+			button.setCallbackData("answer_" + i); // Данные обратного вызова
+
+			List<InlineKeyboardButton> rowInline = new ArrayList<>();
+			rowInline.add(button);
+			rowsInline.add(rowInline);
+		}
+
+		markup.setKeyboard(rowsInline);
+
+		SendMessage message = new SendMessage();
+		message.setChatId(String.valueOf(chatId));
+		message.setText(textToSend.toString());
+		message.setReplyMarkup(markup);
+		bot.send(message);
+
+
 		// TODO: допилить сюда InlineKeyboard в ответы по количеству кнопок
 
-		bot.send(chatId, textToSend.toString());
 	}
 
 	@Override
