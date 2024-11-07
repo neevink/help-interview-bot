@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
-class StartCommandHandler implements CommandHandler {
+public class StartCommandHandler implements CommandHandler {
 
     @Override
     public void handle(TelegramBot bot, Update update) {
