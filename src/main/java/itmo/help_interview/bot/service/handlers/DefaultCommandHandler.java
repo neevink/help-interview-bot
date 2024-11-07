@@ -19,11 +19,7 @@ public class DefaultCommandHandler implements CommandHandler {
     public void handle(TelegramBot bot, Update update) {
         String messageText = update.getMessage().getText();
         long chatId = update.getMessage().getChatId();
-        String userFirstName = update.getMessage().getChat().getFirstName();
-        var textToSend = "Message text: " + messageText +
-                "\nYour name: " + userFirstName +
-                "\nYour chatId: " + chatId +
-                "All users = " + userRepository.findAll().stream().findFirst();
+        var textToSend = "К сожалению, я не понял команду " + messageText + ". Введи команду /help, чтобы увидеть что я умею.";
         bot.send(chatId, textToSend);
     }
 
