@@ -32,7 +32,7 @@ public class StartCommandHandler implements CommandHandler {
         String userFirstName = update.getMessage().getChat().getFirstName();
         String answer = "Привет, " + userFirstName + ", я бот для поддержки и развития твоего " +
                 "технического уровня в IT. Буду отсылать тебе ежедневно вопросы по темам, " +
-                "которые ты выберешь";
+                "которые ты выберешь. Ты можешь выбрать технологию и уровень по команде /settings";
         bot.send(chatId, answer);
     }
 
