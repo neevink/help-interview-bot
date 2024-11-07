@@ -9,6 +9,7 @@ import itmo.help_interview.bot.entity.Answer;
 import itmo.help_interview.bot.entity.Question;
 import itmo.help_interview.bot.entity.Tag;
 import itmo.help_interview.bot.entity.TagCategory;
+import itmo.help_interview.bot.entity.User;
 import itmo.help_interview.bot.repository.TagRepository;
 import itmo.help_interview.bot.service.CommandHandler;
 import itmo.help_interview.bot.service.QuestionService;
@@ -16,6 +17,7 @@ import itmo.help_interview.bot.service.TagService;
 import itmo.help_interview.bot.service.TelegramBot;
 import itmo.help_interview.bot.service.handlers.util.NewQuestionContext;
 import itmo.help_interview.bot.service.handlers.util.NewQuestionContextState;
+import itmo.help_interview.bot.service.handlers.util.RatingConstantsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -35,6 +37,7 @@ public class AddQuestionCommandHandler implements CommandHandler {
     private final Map<Long, NewQuestionContext> userTONewQuestionContext = new HashMap<>();
     private final TagService tagService;
     private final QuestionService questionService;
+    private final RatingConstantsService ratingConstantsService;
 
     @Override
     public String getCommandName() {
@@ -45,14 +48,33 @@ public class AddQuestionCommandHandler implements CommandHandler {
     @Override
     public void handle(TelegramBot bot, Update update) {
         long chatId = update.getMessage().getChatId();
-        // TODO Отправлять отдельным первым сообщением инструкцию по созданию своего вопроса
+
+        // Выкидываем ошибку пользователю если он не создавать вопросы (из-за рейтинга)
+        if (!ratingConstantsService.userAllowToCreateQuestions(chatId)) {
+            bot.send(chatId, "У вас недостаточно рейтинга для создания вопросов. " +
+                    "Необходимо рейтинга " + RatingConstantsService.QUESTION_MAKER_RATING +
+                    ". Свой рейтинг можно проверить по команде /about_me");
+            return;
+        }
+
+        // Не забыть проверять на наличие контекста, если у пользователя уже есть контекст, тогда выводить ему
+        // ошибку и не менять состояние (просто пришедшую команду /add_question игнорировать (с ответным сообщением)
+        // Вдобавок ещё и предлагаем отменить раннее созданный процесс по кнопке
+        if (userTONewQuestionContext.containsKey(chatId)) {
+            InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+            List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+            rowsInline.add(createCancelRow());
+            inlineKeyboardMarkup.setKeyboard(rowsInline);
+            SendMessage message = new SendMessage();
+            message.setChatId(chatId);
+            message.setText("Вы уже создаёте вопрос, сначала закончите или отмените его по кнопке ниже");
+            message.setReplyMarkup(inlineKeyboardMarkup);
+
+            bot.send(message);
+            return;
+        }
 
         // Создаём новый инстанс контекста для данного пользователя и переводим его в WAITING_FOR_TAGS
-        // TODO не забыть проверять на наличие контекста, если у пользователя уже есть контекст, тогда выводить ему
-        // TODO ошибку и не менять состояние (просто пришедшую команду /add_question игнорировать (с ответным сообщением)
-        if (userTONewQuestionContext.containsKey(chatId)) {
-            // TODO см. выше
-        }
         NewQuestionContext context = new NewQuestionContext();
         context.setChatId(chatId);
         context.setQuestion(new Question());
@@ -77,10 +99,22 @@ public class AddQuestionCommandHandler implements CommandHandler {
         CallbackQuery callbackQuery = update.getCallbackQuery();
         long chatId = callbackQuery.getMessage().getChatId();
         int messageId = callbackQuery.getMessage().getMessageId();
-        // TODO если каким то образом контекст удалился за время колбэка то выдавать игнор (или ошибку что процесс уже завершен)
-        if (!userTONewQuestionContext.containsKey(chatId)) {
-            //
+
+        // Выкидываем ошибку пользователю если он не создавать вопросы (из-за рейтинга)
+        if (!ratingConstantsService.userAllowToCreateQuestions(chatId)) {
+            String notEnoughRatingForQuestionsAnswer = "У вас недостаточно рейтинга для создания вопросов. " +
+                    "Необходимо рейтинга " + RatingConstantsService.QUESTION_MAKER_RATING +
+                    ". Свой рейтинг можно проверить по команде /about_me";
+            bot.sendEditMessage(chatId, notEnoughRatingForQuestionsAnswer, messageId);
+            return;
         }
+
+        // Ecли оказалось, что контекст удалился за время колбэка, то менять сообщение с кнопкой на информацию об этом.
+        if (!userTONewQuestionContext.containsKey(chatId)) {
+            bot.sendEditMessage(chatId, "Процесс создания нового вопроса был отменён или уже закончен", messageId);
+            return;
+        }
+
         NewQuestionContext currentUserContext = userTONewQuestionContext.get(chatId);
         Question question = currentUserContext.getQuestion();
 

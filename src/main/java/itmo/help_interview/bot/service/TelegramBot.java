@@ -72,6 +72,17 @@ public class TelegramBot extends TelegramLongPollingBot {
 		}
 	}
 
+	public void sendEditMessage(long chatId, String textToSend, int messageId) {
+		EditMessageText editMessage = new EditMessageText();
+		editMessage.setChatId(chatId);
+		editMessage.setMessageId(messageId);
+		editMessage.setText(textToSend);
+		try {
+			execute(editMessage);
+		} catch (TelegramApiException ignored) {
+		}
+	}
+
 	public void send(EditMessageText sendMessage) {
 		try {
 			execute(sendMessage);

@@ -42,16 +42,22 @@ public class UserService {
         }
     }
 
+    public void clearUserTagsByUserId(long chatId) {
+        User user = getUserById(chatId);
+        user.setTags(new ArrayList<>());
+        userRepository.save(user);
+    }
+
+    public User updateUserRating(User user, long newRating) {
+        user.setRating(newRating);
+        return userRepository.save(user);
+    }
+
     public User getUserById(long chatId) {
         return userRepository.findById(chatId).orElseThrow(
 				UserNotFoundException::new
         );
     }
 
-    public void clearUserTagsByUserId(long chatId) {
-        User user = getUserById(chatId);
-        user.setTags(new ArrayList<>());
-        userRepository.save(user);
-    }
 
 }
