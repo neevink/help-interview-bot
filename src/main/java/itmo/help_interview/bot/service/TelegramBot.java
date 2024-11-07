@@ -1,6 +1,7 @@
 package itmo.help_interview.bot.service;
 
 import itmo.help_interview.bot.CommonUtil;
+import itmo.help_interview.bot.service.handlers.AddQuestionCommandHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 	private String token;
 
 	private final HandleDispatcher handleDispatcher;
+	private final AddQuestionCommandHandler addQuestionCommandHandler;
 
 	@Override
 	public String getBotUsername() {
@@ -43,6 +45,10 @@ public class TelegramBot extends TelegramLongPollingBot {
 			handleDispatcher.dispatchCallback(this, update);
 		} else {
 			// проверяем ожидается ли сообщение от пользователя по контексту и если да то переход в обработку
+			if (addQuestionCommandHandler.checkNewMessageForContextNeeded(update)) {
+				addQuestionCommandHandler.manageContextWithNewMessageFromUser(this, update);
+				return;
+			}
 
 			// код не про команды надо будет поселить тут
 			throw new RuntimeException();
