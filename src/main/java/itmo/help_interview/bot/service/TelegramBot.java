@@ -50,6 +50,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 		SendMessage sendMessage = new SendMessage();
 		sendMessage.setChatId(String.valueOf(chatId));
 		sendMessage.setText(textToSend);
+		sendMessage.enableHtml(true);
 		try {
 			execute(sendMessage);
 		} catch (TelegramApiException ignored) {
@@ -57,6 +58,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 	}
 
 	public void send(SendMessage sendMessage) {
+		sendMessage.enableHtml(true);
 		try {
 			execute(sendMessage);
 		} catch (TelegramApiException ignored) {

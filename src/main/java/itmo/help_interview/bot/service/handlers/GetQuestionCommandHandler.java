@@ -51,10 +51,10 @@ public class GetQuestionCommandHandler implements CommandHandler {
         try {
             questionForAsk = getRandomQuestionForUser(chatId);
         } catch (UserNotFoundException e) {
-            bot.send(chatId, "Ошибка получения вопроса, попробуйте позже");
+            bot.send(chatId, "<b>Ошибка получения вопроса</b>, попробуйте позже");
             return;
         } catch (SettingsNotDefinedYetException e) {
-            bot.send(chatId, "Сначала Вам надо заполнить теги предпочтений");
+            bot.send(chatId, "Сначала Вам надо заполнить <i>теги предпочтений</i>");
             return;
         } catch (NotEvenSinglePotentialQuestionForUserException e) {
             bot.send(chatId, e.getMessage());
@@ -113,9 +113,9 @@ public class GetQuestionCommandHandler implements CommandHandler {
         if (potentialQuestions.isEmpty()) {
             // Не нашлось подходящих запросов, измените предпочтения
             throw new NotEvenSinglePotentialQuestionForUserException(
-                    "Для технологии " + languageUserTag.getName() +
-                            " и сложности " + difficultUserTag.getName() +
-                            " не нашлось (новых) вопросов для Вас");
+                    "Для технологии <i>" + languageUserTag.getName() +
+                            "</i> и сложности <i>" + difficultUserTag.getName() +
+                            "</i> не нашлось (новых) вопросов для Вас");
         }
 
         // Выборка рандомного из них
@@ -153,18 +153,18 @@ public class GetQuestionCommandHandler implements CommandHandler {
 
         StringBuilder textToSend = new StringBuilder();
         if (answers.get(answerIndexFromButton).getIsTrue()) {
-            textToSend.append("Правильно!").append("\n");
+            textToSend.append("<b>Правильно!</b>").append("\n");
         } else {
             Answer correct = answers.stream().filter(Answer::getIsTrue).findFirst().get();
-            textToSend.append("Неправильно!").append("\n");
-            textToSend.append("Правильный ответ: ").append(correct.getText()).append("\n");
+            textToSend.append("<b>Неправильно!</b>").append("\n");
+            textToSend.append("<i>Правильный ответ: </i>").append(correct.getText()).append("\n");
         }
         textToSend.append("\n");
         String comment = question.getComment();
         if (comment == null || comment.isBlank()) {
-            textToSend.append("Автор не оставил комментария");
+            textToSend.append("<i>Автор не оставил комментария</i>");
         } else {
-            textToSend.append("Комментарий от автора:\n").append(comment);
+            textToSend.append("<i>Комментарий от автора:</i>\n").append(comment);
         }
 
         SendMessage message = new SendMessage();
@@ -178,7 +178,7 @@ public class GetQuestionCommandHandler implements CommandHandler {
         // Логика подачи вопроса пользователю
         StringBuilder textToSend = new StringBuilder();
         Question question = questionService.getQuestionById(questionId);
-        textToSend.append("Вопрос: ").append(question.getText()).append("\n\nОтветы:\n");
+        textToSend.append("<b>Вопрос:</b> ").append(question.getText()).append("\n\n<b>Ответы:</b>\n");
         List<Answer> answers = question.getAnswers();
         for (int i = 0; i < answers.size(); i++) {
             Answer current = answers.get(i);
