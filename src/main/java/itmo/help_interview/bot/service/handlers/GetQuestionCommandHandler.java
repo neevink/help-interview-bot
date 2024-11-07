@@ -178,7 +178,7 @@ public class GetQuestionCommandHandler implements CommandHandler {
         // Логика подачи вопроса пользователю
         StringBuilder textToSend = new StringBuilder();
         Question question = questionService.getQuestionById(questionId);
-        textToSend.append("Вопрос: ").append(question.getText()).append("\n\nОтветы:\n");
+        textToSend.append("<b>Вопрос:</b> ").append(question.getText()).append("\n\n<b>Ответы:</b>\n");
         List<Answer> answers = question.getAnswers();
         for (int i = 0; i < answers.size(); i++) {
             Answer current = answers.get(i);
