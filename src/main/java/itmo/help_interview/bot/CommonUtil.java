@@ -21,8 +21,8 @@ public class CommonUtil {
 
     public static Optional<String> extractCommand(String text) {
         var matcher = commandRegex.matcher(text);
-        return matcher.find() ?
-                Optional.of(matcher.group(1)) :
-                Optional.empty();
+        return matcher.find()
+                ? Optional.of(matcher.group(1))
+                : Optional.empty();
     }
 }
