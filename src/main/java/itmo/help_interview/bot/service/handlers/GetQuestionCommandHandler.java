@@ -159,7 +159,13 @@ public class GetQuestionCommandHandler implements CommandHandler {
             textToSend.append("Неправильно!").append("\n");
             textToSend.append("Правильный ответ: ").append(correct.getText()).append("\n");
         }
-        textToSend.append("\n").append("Комментарий от автора ").append(question.getComment());
+        textToSend.append("\n");
+        String comment = question.getComment();
+        if (comment == null || comment.isBlank()) {
+            textToSend.append("Автор не оставил комментария");
+        } else {
+            textToSend.append("Комментарий от автора:\n").append(comment);
+        }
 
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
