@@ -438,5 +438,16 @@ INSERT INTO question_tags (question_id, tag_id)
 VALUES (25, 1),
        (25, 4);
 
+create sequence if not exists question_id_seq;
+alter sequence question_id_seq restart with 26;
+
+create sequence if not exists answer_id_seq;
+alter sequence answer_id_seq restart with 78;
+
+create sequence if not exists tag_id_seq;
+alter sequence tag_id_seq restart with 7;
+
+create sequence if not exists user_answers_id_seq;
+alter sequence user_answers_id_seq restart with 4;
 
 END; $$ LANGUAGE plpgsql;
