@@ -135,9 +135,11 @@ public class AddQuestionCommandHandler implements CommandHandler {
                             sendUserForWatingQuestionText(bot, currentUserContext, messageId);
                             break;
                         case WAITING_FOR_ANSWERS_AND_COMMENT:
-                            connectGetAnswer(bot, currentUserContext);
+                            editLastMessageAboutEditingTags(bot, currentUserContext, messageId);
+                            sendUserForWaitingAnswersAndComment(bot, currentUserContext);
                             break;
                         case WAITING_FOR_APPROVE_OR_EDITING:
+                            editLastMessageAboutEditingTags(bot, currentUserContext, messageId);
                             sendUserForWaitingApproveOrEditing(bot, currentUserContext);
                             break;
                         default:
@@ -166,12 +168,20 @@ public class AddQuestionCommandHandler implements CommandHandler {
                 currentUserContext.setState(NewQuestionContextState.WAITING_FOR_TAGS);
 
                 // Отправляем новое сообщение с инструкцией по редактированию
-                SendMessage editMessages = new SendMessage();
+                EditMessageText editMessages = new EditMessageText();
                 editMessages.setChatId(chatId);
+                editMessages.setMessageId(messageId);
                 editMessages.setText("Вы вернулись к этапу редактирования. Выберите технологию для вопроса:");
                 editMessages.setReplyMarkup(createTechnologyKeyboard());
 
                 bot.send(editMessages);
+                break;
+            case "editquestion":
+                currentUserContext.setBeforeEditing(currentUserContext.getState());
+                // Вернуть пользователя к этапу выбора тегов, например, технологии
+                currentUserContext.setState(NewQuestionContextState.WAITING_FOR_QUESTION_TEXT);
+                // Отправляем новое сообщение с инструкцией по редактированию
+                sendUserForWaitingQuestionTextFromEditing(bot, currentUserContext, messageId);
                 break;
             case "save":
                 Question createdQuestion = questionService.saveNewQuestionByNewQuestionContext(currentUserContext);
@@ -179,6 +189,8 @@ public class AddQuestionCommandHandler implements CommandHandler {
                 SendMessage messageWithCreatedQuestion = new SendMessage();
                 messageWithCreatedQuestion.setChatId(currentUserContext.getChatId());
                 StringBuilder sb = new StringBuilder();
+                sb.append("#").append(createdQuestion.getTags().get(0).getName()).append(" ");
+                sb.append("#").append(createdQuestion.getTags().get(1).getName()).append("\n");
                 sb.append("Вы сохранили вопрос: ").append(createdQuestion.getText());
                 sb.append("\n\nВарианты ответов:");
                 question.getAnswers().stream().forEach(ans -> {
@@ -198,8 +210,6 @@ public class AddQuestionCommandHandler implements CommandHandler {
     }
 
     private void sendUserForWatingQuestionText(TelegramBot bot, NewQuestionContext context, int messageId) {
-        // Пользователю в сообщение с выборкой тегов пишем его выбор и в новом сообщении пишем что надо ввести
-        // текст вопроса
         EditMessageText editMessageNew = new EditMessageText();
         editMessageNew.setChatId(context.getChatId());
         editMessageNew.setMessageId(messageId);
@@ -207,8 +217,44 @@ public class AddQuestionCommandHandler implements CommandHandler {
                 "\nВы выбрали уровень вопроса: " + context.getQuestion().getTags().get(1).getName() +
                 "\n\nТеперь введите текст вопроса одним сообщением ниже");
 
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        rowsInline.add(createEditTagRow());
+        rowsInline.add(createCancelRow());
+        inlineKeyboardMarkup.setKeyboard(rowsInline);
+        editMessageNew.setReplyMarkup(inlineKeyboardMarkup);
+
         bot.send(editMessageNew);
     }
+
+    private void sendUserForWaitingQuestionTextFromEditing(TelegramBot bot, NewQuestionContext context, int messageId) {
+        String oldQuestionText = context.getQuestion().getText();
+        EditMessageText editMessageNew = new EditMessageText();
+        editMessageNew.setChatId(context.getChatId());
+        editMessageNew.setMessageId(messageId);
+        editMessageNew.setText("Вы ввели вопрос: " + oldQuestionText +
+                "\nДля его <i>редактирования</i> введите новый вопрос ниже одним сообщением.");
+
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        rowsInline.add(createCancelRow());
+        inlineKeyboardMarkup.setKeyboard(rowsInline);
+        editMessageNew.setReplyMarkup(inlineKeyboardMarkup);
+
+        bot.send(editMessageNew);
+    }
+
+    private void editLastMessageAboutEditingTags(TelegramBot bot, NewQuestionContext context, int messageId) {
+        EditMessageText editMessageNew = new EditMessageText();
+        editMessageNew.setChatId(context.getChatId());
+        editMessageNew.setMessageId(messageId);
+        editMessageNew.setText("Вы выбрали технологию: " + context.getQuestion().getTags().get(0).getName() +
+                "\nВы выбрали уровень вопроса: " + context.getQuestion().getTags().get(1).getName() +
+                "\nПереходим дальше");
+
+        bot.send(editMessageNew);
+    }
+
 
 
     private String getPanelTagTypeFromCallbackData(String callbackData) {
@@ -336,12 +382,44 @@ public class AddQuestionCommandHandler implements CommandHandler {
         String textOf = update.getMessage().getText();
         context.getQuestion().setText(textOf);
 
+        // Если попали сюда из РЕДАКТИРОВАНИЯ, то надо вернуться откуда вышли
+        if (context.getBeforeEditing() != null) {
+            switch (context.getBeforeEditing()) {
+                case WAITING_FOR_ANSWERS_AND_COMMENT:
+//                    editLastMessageAboutEditingQuestionText(bot, context, messageId);
+                    sendUserForWaitingAnswersAndComment(bot, context);
+                    break;
+                case WAITING_FOR_APPROVE_OR_EDITING:
+//                    editLastMessageAboutEditingQuestionText(bot, context, messageId);
+                    sendUserForWaitingApproveOrEditing(bot, context);
+                    break;
+                default:
+                    //ошибка такого не должно быть
+                    break;
+            }
+            // Возвращаемся из редактирования и обнуляем флаг-состояние beforeEditing
+            context.setState(context.getBeforeEditing());
+            context.setBeforeEditing(null);
+            return;
+        }
         // Переходим к ожиданию ответов на вопрос и комментарию
         context.setState(NewQuestionContextState.WAITING_FOR_ANSWERS_AND_COMMENT);
-        connectGetAnswer(bot, context);
+
+        sendUserForWaitingAnswersAndComment(bot, context);
     }
 
-    private void connectGetAnswer(TelegramBot bot, NewQuestionContext context) {
+    private void editLastMessageAboutEditingQuestionText(TelegramBot bot, NewQuestionContext context, int messageId) {
+        EditMessageText editMessageNew = new EditMessageText();
+        editMessageNew.setChatId(context.getChatId());
+        editMessageNew.setMessageId(messageId);
+        editMessageNew.setText("Вы выбрали технологию: " + context.getQuestion().getTags().get(0).getName() +
+                "\nВы выбрали уровень вопроса: " + context.getQuestion().getTags().get(1).getName() +
+                "\nПереходим дальше");
+
+        bot.send(editMessageNew);
+    }
+
+    private void sendUserForWaitingAnswersAndComment(TelegramBot bot, NewQuestionContext context) {
         String textOf = context.getQuestion().getText();
 
         // Выводим пользователю НОВОЕ сообщение с просьбой указать ответы и комментарий
@@ -362,6 +440,14 @@ public class AddQuestionCommandHandler implements CommandHandler {
         message.setChatId(context.getChatId());
         message.setText(textToAnswer.toString());
 
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        rowsInline.add(createEditTagRow());
+        rowsInline.add(createEditQuestionTextRow());
+        rowsInline.add(createCancelRow());
+        inlineKeyboardMarkup.setKeyboard(rowsInline);
+        message.setReplyMarkup(inlineKeyboardMarkup);
+
         bot.send(message);
     }
 
@@ -374,7 +460,6 @@ public class AddQuestionCommandHandler implements CommandHandler {
             textToAnswer.append("Вы ввели некорректные ответы и(-или) комментарий")
                     .append("\n\nВведите ответы на вопрос и комментарий заново");
 
-            // TODO Добавить в ответ клавиатуру с отменой всего процесса или переходом к шагу редактирования тегов/текста
             SendMessage message = new SendMessage();
             message.setChatId(context.getChatId());
             message.setText(textToAnswer.toString());
@@ -399,8 +484,6 @@ public class AddQuestionCommandHandler implements CommandHandler {
         // Обновляем состояние контекста
         context.setState(NewQuestionContextState.WAITING_FOR_APPROVE_OR_EDITING);
         sendUserForWaitingApproveOrEditing(bot, context);
-
-
     }
 
     private void sendUserForWaitingApproveOrEditing(TelegramBot bot, NewQuestionContext context) {
@@ -415,41 +498,61 @@ public class AddQuestionCommandHandler implements CommandHandler {
 
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-        List<InlineKeyboardButton> saveRow = new ArrayList<>();
-        List<InlineKeyboardButton> editRow = new ArrayList<>();
-        List<InlineKeyboardButton> canselRow = new ArrayList<>();
-
-        InlineKeyboardButton saveButton = createButtonKeyboard("Сохранить", "/add_question_save");
-        InlineKeyboardButton editButton = createButtonKeyboard("Редактировать", "/add_question_edit");
-        InlineKeyboardButton cancelButton = createButtonKeyboard("Отменить", "/add_question_cancel");
-
-        editRow.add(editButton);
-        saveRow.add(saveButton);
-        canselRow.add(cancelButton);
-
-        rowsInline.add(editRow);
-        rowsInline.add(canselRow);
-        rowsInline.add(saveRow);
+        rowsInline.add(createEditTagRow());
+        rowsInline.add(createEditQuestionTextRow());
+        rowsInline.add(createCancelRow());
+        rowsInline.add(createSaveRow());
         inlineKeyboardMarkup.setKeyboard(rowsInline);
         message.setReplyMarkup(inlineKeyboardMarkup);
+
         bot.send(message);
     }
 
-    private InlineKeyboardMarkup createEditTagsKeyboard() {
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-
-        // Кнопка "Редактировать"
+    private List<InlineKeyboardButton> createEditTagRow() {
         List<InlineKeyboardButton> editRow = new ArrayList<>();
-        InlineKeyboardButton editButton = createButtonKeyboard("Редактировать", "/add_question_edit");
+        InlineKeyboardButton editButton = createButtonKeyboard("Редактировать теги", "/add_question_edit");
         editRow.add(editButton);
-
-        // Добавление строк в клавиатуру
-        rowsInline.add(editRow);
-        inlineKeyboardMarkup.setKeyboard(rowsInline);
-
-        return inlineKeyboardMarkup;
+        return editRow;
     }
+
+    private List<InlineKeyboardButton> createEditQuestionTextRow() {
+        List<InlineKeyboardButton> editRow = new ArrayList<>();
+        InlineKeyboardButton editButton = createButtonKeyboard("Изменить вопрос", "/add_question_editquestion");
+        editRow.add(editButton);
+        return editRow;
+    }
+
+    private List<InlineKeyboardButton> createCancelRow() {
+        List<InlineKeyboardButton> cancelRow = new ArrayList<>();
+        InlineKeyboardButton cancelButton = createButtonKeyboard("Отменить", "/add_question_cancel");
+        cancelRow.add(cancelButton);
+        return cancelRow;
+    }
+
+    private List<InlineKeyboardButton> createSaveRow() {
+        List<InlineKeyboardButton> saveRow = new ArrayList<>();
+        InlineKeyboardButton saveButton = createButtonKeyboard("Сохранить", "/add_question_save");
+        saveRow.add(saveButton);
+        return saveRow;
+    }
+
+
+
+//    private InlineKeyboardMarkup createEditTagsKeyboard() {
+//        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+//        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+//
+//        // Кнопка "Редактировать"
+//        List<InlineKeyboardButton> editRow = new ArrayList<>();
+//        InlineKeyboardButton editButton = createButtonKeyboard("Редактировать", "/add_question_edit");
+//        editRow.add(editButton);
+//
+//        // Добавление строк в клавиатуру
+//        rowsInline.add(editRow);
+//        inlineKeyboardMarkup.setKeyboard(rowsInline);
+//
+//        return inlineKeyboardMarkup;
+//    }
 
     private InlineKeyboardButton createButtonKeyboard(String text, String callbackData) {
         InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
@@ -462,20 +565,20 @@ public class AddQuestionCommandHandler implements CommandHandler {
 
 
 
-    private InlineKeyboardMarkup createCancelKeyboard() {
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-
-        // Кнопка "Отменить"
-        List<InlineKeyboardButton> cancelRow = new ArrayList<>();
-        InlineKeyboardButton cancelButton = createButtonKeyboard("Отменить", "/add_question_cancel");
-        cancelRow.add(cancelButton);
-
-        // Добавление строк в клавиатуру
-        rowsInline.add(cancelRow);
-        inlineKeyboardMarkup.setKeyboard(rowsInline);
-        return inlineKeyboardMarkup;
-    }
+//    private InlineKeyboardMarkup createCancelKeyboard() {
+//        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+//        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+//
+//        // Кнопка "Отменить"
+//        List<InlineKeyboardButton> cancelRow = new ArrayList<>();
+//        InlineKeyboardButton cancelButton = createButtonKeyboard("Отменить", "/add_question_cancel");
+//        cancelRow.add(cancelButton);
+//
+//        // Добавление строк в клавиатуру
+//        rowsInline.add(cancelRow);
+//        inlineKeyboardMarkup.setKeyboard(rowsInline);
+//        return inlineKeyboardMarkup;
+//    }
 
     private InlineKeyboardMarkup createEditAndCancelKeyboard() {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();

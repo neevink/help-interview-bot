@@ -36,7 +36,6 @@ public class SettingsCommandHandler implements CommandHandler {
                 .filter(tag -> TagCategory.LANGUAGE.equals(tag.getCategory()))
                 .toList();
 
-
         // Создаем InlineKeyboardMarkup
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
@@ -121,11 +120,14 @@ public class SettingsCommandHandler implements CommandHandler {
                 break;
             case "difficulty":
                 userService.addTagToUser(chatId, getPressedButtonFromCallbackData(callbackData));
+                List<Tag> userTags = userService.getUserById(chatId).getTags();
 
                 EditMessageText editMessageNew = new EditMessageText();
                 editMessageNew.setChatId(chatId);
                 editMessageNew.setMessageId(messageId);
-                editMessageNew.setText("Вы выбрали уровень: " + getPressedButtonFromCallbackData(callbackData) + " . Спасибо, ваши настройки сохранены. Теперь введите команду /get_question, чтобы начать подготовку!");
+                editMessageNew.setText("Вы выбрали технологию: " + userTags.get(0).getName() +
+                        "\nВы выбрали уровень вопроса: " + userTags.get(1).getName() +
+                        " . Спасибо, ваши настройки сохранены. Теперь введите команду /get_question, чтобы начать подготовку!");
 
                 // TODO: поменять на вызов bot.send(SendMessage message)
                 try {

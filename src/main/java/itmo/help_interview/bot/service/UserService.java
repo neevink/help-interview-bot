@@ -3,6 +3,7 @@ package itmo.help_interview.bot.service;
 
 import itmo.help_interview.bot.entity.Tag;
 import itmo.help_interview.bot.entity.User;
+import itmo.help_interview.bot.exceptions.UserNotFoundException;
 import itmo.help_interview.bot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,12 @@ public class UserService {
         } else {
             throw new RuntimeException("User not found");
         }
+    }
+
+    public User getUserById(long chatId) {
+        return userRepository.findById(chatId).orElseThrow(
+				UserNotFoundException::new
+        );
     }
 
 }
