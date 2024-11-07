@@ -31,6 +31,9 @@ public class SettingsCommandHandler implements CommandHandler {
         String answer = "По какой технологии ты хочешь получать вопросы?";
         long chatId = update.getMessage().getChatId();
 
+        userService.clearUserTagsByUserId(chatId);
+
+
         // Получаем список тегов из репозитория с фильтром по технологиям (языкам)
         List<Tag> tags = tagRepository.findAll().stream()
                 .filter(tag -> TagCategory.LANGUAGE.equals(tag.getCategory()))

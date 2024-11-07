@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 
@@ -45,6 +46,12 @@ public class UserService {
         return userRepository.findById(chatId).orElseThrow(
 				UserNotFoundException::new
         );
+    }
+
+    public void clearUserTagsByUserId(long chatId) {
+        User user = getUserById(chatId);
+        user.setTags(new ArrayList<>());
+        userRepository.save(user);
     }
 
 }
