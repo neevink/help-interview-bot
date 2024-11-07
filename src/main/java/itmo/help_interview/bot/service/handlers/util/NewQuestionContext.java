@@ -12,4 +12,5 @@ public class NewQuestionContext {
     private Long chatId;
     private NewQuestionContextState state;
     private Question question;
+    private NewQuestionContextState beforeEditing;
 }
