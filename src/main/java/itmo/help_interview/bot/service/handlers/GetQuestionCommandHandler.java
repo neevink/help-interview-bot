@@ -51,7 +51,7 @@ public class GetQuestionCommandHandler implements CommandHandler {
         try {
             questionForAsk = getRandomQuestionForUser(chatId);
         } catch (UserNotFoundException e) {
-            bot.send(chatId, "<b>Ошибка получения вопроса</b>, попробуйте позже");
+            bot.send(chatId, "Ошибка чтения вашего пользователя, сначала зарегистрируйтесь по команде <i>/start</i>");
             return;
         } catch (SettingsNotDefinedYetException e) {
             bot.send(chatId, "Сначала Вам надо заполнить <i>теги предпочтений</i>");
