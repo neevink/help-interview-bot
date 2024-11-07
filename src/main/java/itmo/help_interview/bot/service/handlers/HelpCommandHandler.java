@@ -18,10 +18,11 @@ public class HelpCommandHandler implements CommandHandler {
         long chatId = update.getMessage().getChatId();
         var textToSend = "Список доступных команд: " +
                 "\n/help — вывести информацию по всем командам" +
-                "\n/start — вывести информацию по всем командам" +
+                "\n/start — запустить чат-бота" +
                 "\n/settings — настройка фильтра вопросов" +
                 "\n/get_question — получить следующий вопрос по подготовке к интервью" +
-                "\n/add_question — создать новый вопрос";
+                "\n/add_question — создать новый вопрос" +
+                "\n/my_questions — посмотреть все созданные вопросы";
         bot.send(chatId, textToSend);
     }
 
