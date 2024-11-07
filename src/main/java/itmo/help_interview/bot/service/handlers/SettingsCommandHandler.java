@@ -22,7 +22,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-class SettingsCommandHandler implements CommandHandler {
+public class SettingsCommandHandler implements CommandHandler {
     private final TagRepository tagRepository;
     private final UserService userService;
 
@@ -31,11 +31,13 @@ class SettingsCommandHandler implements CommandHandler {
         String answer = "По какой технологии ты хочешь получать вопросы?";
         long chatId = update.getMessage().getChatId();
 
+        userService.clearUserTagsByUserId(chatId);
+
+
         // Получаем список тегов из репозитория с фильтром по технологиям (языкам)
         List<Tag> tags = tagRepository.findAll().stream()
                 .filter(tag -> TagCategory.LANGUAGE.equals(tag.getCategory()))
                 .toList();
-
 
         // Создаем InlineKeyboardMarkup
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
@@ -121,11 +123,14 @@ class SettingsCommandHandler implements CommandHandler {
                 break;
             case "difficulty":
                 userService.addTagToUser(chatId, getPressedButtonFromCallbackData(callbackData));
+                List<Tag> userTags = userService.getUserById(chatId).getTags();
 
                 EditMessageText editMessageNew = new EditMessageText();
                 editMessageNew.setChatId(chatId);
                 editMessageNew.setMessageId(messageId);
-                editMessageNew.setText("Вы выбрали уровень: " + getPressedButtonFromCallbackData(callbackData) + " . Спасибо, ваши настройки сохранены. Теперь введите команду /get_question, чтобы начать подготовку!");
+                editMessageNew.setText("Вы выбрали технологию: " + userTags.get(0).getName() +
+                        "\nВы выбрали уровень вопроса: " + userTags.get(1).getName() +
+                        " . Спасибо, ваши настройки сохранены. Теперь введите команду /get_question, чтобы начать подготовку!");
 
                 // TODO: поменять на вызов bot.send(SendMessage message)
                 try {
