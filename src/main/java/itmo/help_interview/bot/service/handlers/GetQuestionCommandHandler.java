@@ -164,7 +164,7 @@ public class GetQuestionCommandHandler implements CommandHandler {
         if (comment == null || comment.isBlank()) {
             textToSend.append("<i>Автор не оставил комментария</i>");
         } else {
-            textToSend.append("</i>Комментарий от автора:</i>\n").append(comment);
+            textToSend.append("<i>Комментарий от автора:</i>\n").append(comment);
         }
 
         SendMessage message = new SendMessage();
