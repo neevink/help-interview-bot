@@ -45,8 +45,7 @@ class AddQuestionCommandHandler implements CommandHandler {
     public void handle(TelegramBot bot, Update update) {
         long chatId = update.getMessage().getChatId();
         // TODO Отправлять отдельным первым сообщением инструкцию по созданию своего вопроса
-
-
+        
         // Создаём новый инстанс контекста для данного пользователя и переводим его в WAITING_FOR_TAGS
         // TODO не забыть проверять на наличие контекста, если у пользователя уже есть контекст, тогда выводить ему
         // TODO ошибку и не менять состояние (просто пришедшую команду /add_question игнорировать (с ответным сообщением)
@@ -62,23 +61,7 @@ class AddQuestionCommandHandler implements CommandHandler {
         // Отправляем сообщение с началом процесса -- выбором тегов (сложности и технологии)
         String answer = "Выберете технологию для вопроса";
         // Получаем список тегов из репозитория с фильтром по технологиям (языкам)
-        List<Tag> tags = tagRepository.findAll().stream()
-                .filter(tag -> TagCategory.LANGUAGE.equals(tag.getCategory()))
-                .toList();
-
-        // Создаем InlineKeyboardMarkup
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-        for (Tag tag : tags) {
-            List<InlineKeyboardButton> rowInline = new ArrayList<>();
-            InlineKeyboardButton button = new InlineKeyboardButton();
-            button.setText(tag.getName());
-            button.setCallbackData("/add_question_technology" + tag.getName()); // Используем текст тега в качестве callback data
-            rowInline.add(button);
-            rowsInline.add(rowInline);
-        }
-        inlineKeyboardMarkup.setKeyboard(rowsInline);
-
+        InlineKeyboardMarkup inlineKeyboardMarkup = createTechnologyKeyboard();
         // Отправляем сообщение с клавиатурой
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
@@ -94,6 +77,15 @@ class AddQuestionCommandHandler implements CommandHandler {
         CallbackQuery callbackQuery = update.getCallbackQuery();
         long chatId = callbackQuery.getMessage().getChatId();
         int messageId = callbackQuery.getMessage().getMessageId();
+        if (callbackData.equals("/add_question_cancel")) {
+            // Удаляем контекст пользователя и отправляем сообщение об отмене
+            userTONewQuestionContext.remove(chatId);
+            SendMessage cancelMessage = new SendMessage();
+            cancelMessage.setChatId(chatId);
+            cancelMessage.setText("Вы отменили создание вопроса.");
+            bot.send(cancelMessage);
+            return;
+        }
         // TODO если каким то образом контекст удалился за время колбэка то выдавать игнор (или ошибку что процесс уже завершен)
         if (!userTONewQuestionContext.containsKey(chatId)) {
             //
@@ -157,10 +149,15 @@ class AddQuestionCommandHandler implements CommandHandler {
 
                 bot.send(editMessageNew);
                 break;
+
             default:
+
                 break;
+
         }
+
     }
+
 
 
     private String getPanelTagTypeFromCallbackData(String callbackData){
@@ -186,10 +183,45 @@ class AddQuestionCommandHandler implements CommandHandler {
             List<InlineKeyboardButton> rowInline = new ArrayList<>();
             InlineKeyboardButton button = new InlineKeyboardButton();
             button.setText(tag.getName());
-            button.setCallbackData("/add_question_difficulty_" + tag.getName()); // Используем текст тега в качестве callback data
+            button.setCallbackData("/add_question_difficulty" + tag.getName()); // Используем текст тега в качестве callback data
             rowInline.add(button);
             rowsInline.add(rowInline);
         }
+
+        inlineKeyboardMarkup.setKeyboard(rowsInline);
+        List<InlineKeyboardButton> cancelRow = new ArrayList<>();
+        InlineKeyboardButton cancelButton = new InlineKeyboardButton();
+        cancelButton.setText("Отменить");
+        cancelButton.setCallbackData("/add_question_cancel");
+        cancelRow.add(cancelButton);
+        rowsInline.add(cancelRow);
+
+        inlineKeyboardMarkup.setKeyboard(rowsInline);
+        return inlineKeyboardMarkup;
+    }
+    private InlineKeyboardMarkup createTechnologyKeyboard() {
+        List<Tag> tags = tagRepository.findAll().stream()
+                .filter(tag -> TagCategory.LANGUAGE.equals(tag.getCategory()))
+                .toList();
+
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+
+        for (Tag tag : tags) {
+            List<InlineKeyboardButton> rowInline = new ArrayList<>();
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(tag.getName());
+            button.setCallbackData("/add_question_technology_" + tag.getName());
+            rowInline.add(button);
+            rowsInline.add(rowInline);
+        }
+        inlineKeyboardMarkup.setKeyboard(rowsInline);
+        List<InlineKeyboardButton> cancelRow = new ArrayList<>();
+        InlineKeyboardButton cancelButton = new InlineKeyboardButton();
+        cancelButton.setText("Отменить");
+        cancelButton.setCallbackData("/add_question_cancel");
+        cancelRow.add(cancelButton);
+        rowsInline.add(cancelRow);
 
         inlineKeyboardMarkup.setKeyboard(rowsInline);
         return inlineKeyboardMarkup;
