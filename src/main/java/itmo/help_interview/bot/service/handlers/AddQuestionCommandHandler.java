@@ -195,18 +195,7 @@ public class AddQuestionCommandHandler implements CommandHandler {
                 // Тут же сообщение о том что за вопрос сохранился
                 SendMessage messageWithCreatedQuestion = new SendMessage();
                 messageWithCreatedQuestion.setChatId(currentUserContext.getChatId());
-                StringBuilder sb = new StringBuilder();
-                sb.append("#").append(createdQuestion.getTags().get(0).getName()).append(" ");
-                sb.append("#").append(createdQuestion.getTags().get(1).getName()).append("\n");
-                sb.append("Вы сохранили вопрос: ").append(createdQuestion.getText());
-                sb.append("\n\nВарианты ответов:");
-                question.getAnswers().stream().forEach(ans -> {
-                    sb.append("\n").append(ans.getText());
-                    if (ans.getIsTrue()) {
-                        sb.append(" [true]");
-                    }
-                });
-                sb.append("\n\nКомментарий от автора: ").append(question.getComment());
+                StringBuilder sb = getStringBuilderWithFullQuestionFilled(createdQuestion);
                 messageWithCreatedQuestion.setText(sb.toString());
 
                 bot.send(messageWithCreatedQuestion);
@@ -214,6 +203,22 @@ public class AddQuestionCommandHandler implements CommandHandler {
             default:
                 break;
         }
+    }
+
+    private static StringBuilder getStringBuilderWithFullQuestionFilled(Question createdQuestion) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("#").append(createdQuestion.getTags().get(0).getName()).append(" ");
+        sb.append("#").append(createdQuestion.getTags().get(1).getName()).append("\n");
+        sb.append("Вы сохранили вопрос: ").append(createdQuestion.getText());
+        sb.append("\n\nВарианты ответов:");
+        createdQuestion.getAnswers().stream().forEach(ans -> {
+            sb.append("\n").append(ans.getText());
+            if (ans.getIsTrue()) {
+                sb.append(" [true]");
+            }
+        });
+        sb.append("\n\nКомментарий от автора: ").append(createdQuestion.getComment());
+        return sb;
     }
 
     private void sendUserForWatingQuestionText(TelegramBot bot, NewQuestionContext context, int messageId) {
@@ -240,7 +245,7 @@ public class AddQuestionCommandHandler implements CommandHandler {
         editMessageNew.setChatId(context.getChatId());
         editMessageNew.setMessageId(messageId);
         editMessageNew.setText("Вы ввели вопрос: " + oldQuestionText +
-                "\nДля его <i>редактирования</i> введите новый вопрос ниже одним сообщением.");
+                "\nДля его редактирования введите новый вопрос ниже одним сообщением.");
 
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
@@ -434,8 +439,8 @@ public class AddQuestionCommandHandler implements CommandHandler {
         textToAnswer.append("Вы ввели вопрос:\n\n")
                 .append(textOf)
                 .append("\n\nВведите одним сообщением ниже все ответы и комментарий от автора к вопросу ")
-                .append("в следующем формате \n<ПРАВИЛЬНЫЙ_ОТВЕТ>\n<КОММЕНТАРИЙ_ОТ_АВТОРА>")
-                .append("\n<НЕПРАВИЛЬНЫЙ_ОТВЕТ>\n<НЕПРАВИЛЬНЫЙ_ОТВЕТ>\n...")
+                .append("в следующем формате \n[ПРАВИЛЬНЫЙ_ОТВЕТ]\n[КОММЕНТАРИЙ_ОТ_АВТОРА]")
+                .append("\n[НЕПРАВИЛЬНЫЙ_ОТВЕТ]\n[НЕПРАВИЛЬНЫЙ_ОТВЕТ]\n...")
                 .append("\nУчтите, что между ответами и комментариями один перевод строки ")
                 .append("(не используйте перевод строки в любом из ответов). ")
                 .append("Комментарий не может быть пустым. ")
@@ -541,7 +546,8 @@ public class AddQuestionCommandHandler implements CommandHandler {
         // Так что нужен callback обработчик
         SendMessage message = new SendMessage();
         message.setChatId(context.getChatId());
-        message.setText("Последний шаг! Вы можете либо сохранить вопрос (он отправится на модерацию), " +
+        String fullQuestionFiller = getStringBuilderWithFullQuestionFilled(context.getQuestion()).toString();
+        message.setText(fullQuestionFiller + "\nПоследний шаг! Вы можете либо сохранить вопрос (он отправится на модерацию), " +
                 "либо редактировать/отменить его");
         // TODO добавить клавиатуру для редактирования или отмены
         // TODO в таком случае через callback отлавливать savequestion и сохранять через метод в QuestionService
