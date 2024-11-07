@@ -16,9 +16,9 @@ public class HelpCommandHandler implements CommandHandler {
     @Override
     public void handle(TelegramBot bot, Update update) {
         long chatId = update.getMessage().getChatId();
-        var textToSend = "Список доступных команд: " +
+        var textToSend = "<b>Список доступных команд: </b>" +
                 "\n/help — вывести информацию по всем командам" +
-                "\n/start — вывести информацию по всем командам" +
+                "\n/start — начать диалог с ботом" +
                 "\n/settings — настройка фильтра вопросов" +
                 "\n/get_question — получить следующий вопрос по подготовке к интервью" +
                 "\n/add_question — создать новый вопрос";

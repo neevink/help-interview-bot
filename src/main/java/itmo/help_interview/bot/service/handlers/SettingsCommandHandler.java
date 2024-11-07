@@ -102,7 +102,7 @@ class SettingsCommandHandler implements CommandHandler {
                 userService.addTagToUser(chatId, getPressedButtonFromCallbackData(callbackData));
 
                 // Подготовка нового текста и клавиатуры
-                String newText = "Вы выбрали технологию для изучения: " + getPressedButtonFromCallbackData(callbackData) + ". На какую позицию вы претендуете?";
+                String newText = "Вы выбрали технологию для изучения: <i>" + getPressedButtonFromCallbackData(callbackData) + "</i>. На какую позицию вы претендуете?";
                 InlineKeyboardMarkup newKeyboard = createNewKeyboard();
 
                 // Создание EditMessageText для замены текста и клавиатуры
@@ -125,7 +125,7 @@ class SettingsCommandHandler implements CommandHandler {
                 EditMessageText editMessageNew = new EditMessageText();
                 editMessageNew.setChatId(chatId);
                 editMessageNew.setMessageId(messageId);
-                editMessageNew.setText("Вы выбрали уровень: " + getPressedButtonFromCallbackData(callbackData) + " . Спасибо, ваши настройки сохранены. Теперь введите команду /get_question, чтобы начать подготовку!");
+                editMessageNew.setText("Вы выбрали уровень: <i>" + getPressedButtonFromCallbackData(callbackData) + "</i> . Спасибо, ваши настройки сохранены. Теперь введите команду <b>/get_question</b>, чтобы начать подготовку!");
 
                 // TODO: поменять на вызов bot.send(SendMessage message)
                 try {

@@ -11,7 +11,7 @@ class StartCommandHandler implements CommandHandler {
     @Override
     public void handle(TelegramBot bot, Update update) {
         String userFirstName = update.getMessage().getChat().getFirstName();
-        String answer = "Привет, " + userFirstName + ", я бот для поддержки и развития твоего " +
+        String answer = "Привет, <i>" + userFirstName + "</i>, я бот для поддержки и развития твоего " +
                 "технического уровня в IT. Буду отсылать тебе ежедневно вопросы по темам, " +
                 "которые ты выберешь";
         long chatId = update.getMessage().getChatId();
