@@ -62,39 +62,28 @@ public class GetQuestionCommandHandler implements CommandHandler {
         }
 
         // Логика подачи вопроса пользователю
-        StringBuilder textToSend = new StringBuilder();
-        textToSend.append("Вопрос: ").append(questionForAsk.getText()).append("\n\nОтветы:\n");
+        Long questionId = questionForAsk.getId();
         List<Answer> answers = questionForAsk.getAnswers();
-        for (int i = 0; i < answers.size(); i++) {
-            Answer current = answers.get(i);
-            textToSend.append(i + 1).append(". ").append(current.getText()).append("\n");
-        }
-
-
-        // допилить сюда InlineKeyboard в ответы по количеству кнопок
-
+        String textToSend = generateQuestionFullTextFromQuestionId(questionId);
+        // Клавиатура с овтетами
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-
         for (int i = 0; i < answers.size(); i++) {
             InlineKeyboardButton button = new InlineKeyboardButton();
             button.setText(String.valueOf(i + 1)); // Текст кнопки (например, "1", "2" и т.д.)
-            button.setCallbackData("/get_question_" + i + "_" + questionForAsk.getId()); // Данные обратного вызова
-
+            // Данные обратного вызова
+            button.setCallbackData("/get_question_" + i + "_" + questionId);
             List<InlineKeyboardButton> rowInline = new ArrayList<>();
             rowInline.add(button);
             rowsInline.add(rowInline);
         }
-
         markup.setKeyboard(rowsInline);
 
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
-        message.setText(textToSend.toString());
+        message.setText(textToSend);
         message.setReplyMarkup(markup);
         bot.send(message);
-
-
     }
 
 
@@ -126,7 +115,7 @@ public class GetQuestionCommandHandler implements CommandHandler {
             throw new NotEvenSinglePotentialQuestionForUserException(
                     "Для технологии " + languageUserTag.getName() +
                             " и сложности " + difficultUserTag.getName() +
-                            " не нашлось вопросов для Вас");
+                            " не нашлось (новых) вопросов для Вас");
         }
 
         // Выборка рандомного из них
@@ -143,10 +132,11 @@ public class GetQuestionCommandHandler implements CommandHandler {
         int messageId = callbackQuery.getMessage().getMessageId();
 
         Integer answerIndexFromButton = Integer.valueOf(getPanelAnswerIndexFromCallbackData(callbackData));
+        Long questionId = Long.parseLong(getPanelQuestionIdFromCallbackData(callbackData));
         // Меняем старое сообщение чтобы нельзя было на него снова ответить
         EditMessageText editMessageNew = new EditMessageText();
         editMessageNew.setChatId(chatId);
-        editMessageNew.setText("EDITED???");
+        editMessageNew.setText(generateQuestionFullTextFromQuestionId(questionId));
         editMessageNew.setMessageId(messageId);
         editMessageNew.setReplyMarkup(null);
 
@@ -158,7 +148,6 @@ public class GetQuestionCommandHandler implements CommandHandler {
         }
 
         // Пишем сообщение с правильным ответом и комментариями
-        Long questionId = Long.parseLong(getPanelQuestionIdFromCallbackData(callbackData));
         Question question = questionService.getQuestionById(questionId);
         List<Answer> answers = question.getAnswers();
 
@@ -166,11 +155,11 @@ public class GetQuestionCommandHandler implements CommandHandler {
         if (answers.get(answerIndexFromButton).getIsTrue()) {
             textToSend.append("Правильно!").append("\n");
         } else {
-            Answer correct = answers.stream().filter(ans -> ans.getIsTrue()).findFirst().get();
+            Answer correct = answers.stream().filter(Answer::getIsTrue).findFirst().get();
             textToSend.append("Неправильно!").append("\n");
             textToSend.append("Правильный ответ: ").append(correct.getText()).append("\n");
         }
-        textToSend.append("\n").append("Комментарий от автора").append(question.getComment());
+        textToSend.append("\n").append("Комментарий от автора ").append(question.getComment());
 
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
@@ -178,6 +167,20 @@ public class GetQuestionCommandHandler implements CommandHandler {
         bot.send(message);
 
     }
+
+	private String generateQuestionFullTextFromQuestionId(Long questionId) {
+        // Логика подачи вопроса пользователю
+        StringBuilder textToSend = new StringBuilder();
+        Question question = questionService.getQuestionById(questionId);
+        textToSend.append("Вопрос: ").append(question.getText()).append("\n\nОтветы:\n");
+        List<Answer> answers = question.getAnswers();
+        for (int i = 0; i < answers.size(); i++) {
+            Answer current = answers.get(i);
+            textToSend.append(i + 1).append(". ").append(current.getText()).append("\n");
+        }
+
+        return textToSend.toString();
+	}
 
     private String getPanelAnswerIndexFromCallbackData(String callbackData) {
         return callbackData.split("_")[2];
