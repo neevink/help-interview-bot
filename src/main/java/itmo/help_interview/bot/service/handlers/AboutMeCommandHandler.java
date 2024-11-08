@@ -31,7 +31,7 @@ class AboutMeCommandHandler implements CommandHandler {
         answerAboutUser.append("\n");
         // Добавляем информацию о рейтинге
         var rating = user.getRating();
-        answerAboutUser.append("Ваш рейтинг: " + rating);
+        answerAboutUser.append("Ваш рейтинг: ").append(rating);
         // Выводим плачевную информацию пользователю если он в бане
         if (user.isBanned()) {
             answerAboutUser.append("\n\nВЫ ЗАБАНЕНЫ! Вы не можете добавлять свои вопросы и модерировать чужие");
