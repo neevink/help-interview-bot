@@ -30,7 +30,7 @@ public class User {
 	private boolean isBanned;
 
 	@Column(name = "rating", nullable = false)
-	private long rating;
+	private int rating;
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(

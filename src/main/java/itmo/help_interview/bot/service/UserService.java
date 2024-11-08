@@ -48,7 +48,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public User updateUserRating(User user, long newRating) {
+    public User updateUserRating(User user, int newRating) {
         user.setRating(newRating);
         return userRepository.save(user);
     }

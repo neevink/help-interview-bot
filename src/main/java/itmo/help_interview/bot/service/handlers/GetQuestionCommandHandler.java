@@ -6,22 +6,19 @@ import itmo.help_interview.bot.entity.Tag;
 import itmo.help_interview.bot.exceptions.NotEvenSinglePotentialQuestionForUserException;
 import itmo.help_interview.bot.exceptions.SettingsNotDefinedYetException;
 import itmo.help_interview.bot.exceptions.UserNotFoundException;
-import itmo.help_interview.bot.repository.QuestionRepository;
-import itmo.help_interview.bot.repository.UserRepository;
 import itmo.help_interview.bot.service.CommandHandler;
 import itmo.help_interview.bot.service.QuestionService;
 import itmo.help_interview.bot.service.TagService;
 import itmo.help_interview.bot.service.TelegramBot;
-import jakarta.persistence.Id;
+import itmo.help_interview.bot.service.UserService;
+import itmo.help_interview.bot.service.handlers.util.RatingConstantsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,16 +31,16 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class GetQuestionCommandHandler implements CommandHandler {
 
-    private final UserRepository userRepository;
 
     private final TagService tagService;
+    private final UserService userService;
     private final QuestionService questionService;
+    private final RatingConstantsService ratingConstantsService;
 
     private static Random rnd = new Random(42);
 
     @Override
     public void handle(TelegramBot bot, Update update) {
-        String messageText = update.getMessage().getText();
         long chatId = update.getMessage().getChatId();
 
         // Логика выборки вопроса
@@ -96,10 +93,7 @@ public class GetQuestionCommandHandler implements CommandHandler {
         List<Tag> userTags;
         // Поиск юзера и ошибка если не нашли его (что странно, юзер должен создаваться
         // при первом обращении от него (МОЖЕТ быть сделать создание юзера в таком случае)
-        userTags = userRepository
-                .findById(chatId)
-                .orElseThrow(UserNotFoundException::new)
-                .getTags();
+        userTags = userService.getUserById(chatId).getTags();
         // Теги у пользователя должны быть настроены
         if (userTags.isEmpty()) {
             throw new SettingsNotDefinedYetException();
@@ -134,27 +128,21 @@ public class GetQuestionCommandHandler implements CommandHandler {
         Integer answerIndexFromButton = Integer.valueOf(getPanelAnswerIndexFromCallbackData(callbackData));
         Long questionId = Long.parseLong(getPanelQuestionIdFromCallbackData(callbackData));
         // Меняем старое сообщение чтобы нельзя было на него снова ответить
-        EditMessageText editMessageNew = new EditMessageText();
-        editMessageNew.setChatId(chatId);
-        editMessageNew.setText(generateQuestionFullTextFromQuestionId(questionId));
-        editMessageNew.setMessageId(messageId);
-        editMessageNew.setReplyMarkup(null);
+        bot.sendEditMessage(chatId, generateQuestionFullTextFromQuestionId(questionId), messageId);
 
-        // TODO: поменять на вызов bot.send(SendMessage message)
-        try {
-            bot.execute(editMessageNew);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-
-        // Пишем сообщение с правильным ответом и комментариями
+        // Проверяем сообщение и пишем сообщение с правильным ответом и комментариями
         Question question = questionService.getQuestionById(questionId);
+        boolean isAnswerCorrect;
         List<Answer> answers = question.getAnswers();
-
         StringBuilder textToSend = new StringBuilder();
+
         if (answers.get(answerIndexFromButton).getIsTrue()) {
+            // Правильный ответ, помечаем, что пользователь ответил правильно
+            isAnswerCorrect = true;
             textToSend.append("Правильно!").append("\n");
         } else {
+            // Неправильный ответ
+            isAnswerCorrect = false;
             Answer correct = answers.stream().filter(Answer::getIsTrue).findFirst().get();
             textToSend.append("Неправильно!").append("\n");
             textToSend.append("Правильный ответ: ").append(correct.getText()).append("\n");
@@ -167,11 +155,11 @@ public class GetQuestionCommandHandler implements CommandHandler {
             textToSend.append("Комментарий от автора:\n").append(comment);
         }
 
-        SendMessage message = new SendMessage();
-        message.setChatId(String.valueOf(chatId));
-        message.setText(textToSend.toString());
-        bot.send(message);
+        bot.send(chatId, textToSend.toString());
 
+        // Переходим к логике выдаче или снятия рейтинга за ответ
+        Tag questionDifficulty = tagService.getDifficultTagFromList(question.getTags());
+        ratingConstantsService.computeNewUserRatingAfterHisAnswer(chatId, isAnswerCorrect, questionDifficulty);
     }
 
 	private String generateQuestionFullTextFromQuestionId(Long questionId) {
