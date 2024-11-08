@@ -244,6 +244,7 @@ public class AddQuestionCommandHandler implements CommandHandler {
                 break;
             case "save":
                 Question createdQuestion = questionService.saveNewQuestionByNewQuestionContext(currentUserContext);
+                userTONewQuestionContext.remove(chatId);
                 // Тут же сообщение о том что за вопрос сохранился
                 SendMessage messageWithCreatedQuestion = new SendMessage();
                 messageWithCreatedQuestion.setChatId(currentUserContext.getChatId());

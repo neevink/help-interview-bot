@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class RatingBanConstantsService {
-	public static int MODERATION_RATING = 50;
-	public static int QUESTION_MAKER_RATING = 20;
+	public static int MODERATION_RATING = 5;
+	public static int QUESTION_MAKER_RATING = 3;
 
 	private final UserService userService;
 
@@ -47,6 +47,10 @@ public class RatingBanConstantsService {
 		int newRating = oldRating += additionRating;
 
 		userService.updateUserRating(user, newRating);
+	}
+
+	public boolean userAllowToModerateQuestions(long chatId) {
+		return userService.getUserById(chatId).getRating() > MODERATION_RATING;
 	}
 
 

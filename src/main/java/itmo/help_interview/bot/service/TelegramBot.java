@@ -9,6 +9,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Component
@@ -52,6 +53,17 @@ public class TelegramBot extends TelegramLongPollingBot {
 
 			// код не про команды надо будет поселить тут
 			throw new RuntimeException();
+		}
+	}
+
+	public void send(long chatId, String textToSend, InlineKeyboardMarkup markup) {
+		SendMessage sendMessage = new SendMessage();
+		sendMessage.setChatId(String.valueOf(chatId));
+		sendMessage.setText(textToSend);
+		sendMessage.setReplyMarkup(markup);
+		try {
+			execute(sendMessage);
+		} catch (TelegramApiException ignored) {
 		}
 	}
 

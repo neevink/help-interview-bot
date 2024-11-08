@@ -9,4 +9,8 @@ public interface UserQuestionAnswerRepository extends JpaRepository<UserQuestion
 
 	List<UserQuestionAnswer> findAllByUser_chatId(Long chatId);
 
+	List<UserQuestionAnswer> findAllByQuestion_idAndReactionIsNotNull(Long questionId);
+
+	List<UserQuestionAnswer> findAllByUser_chatIdAndQuestion_id(Long chatId, Long questionId);
+
 }
