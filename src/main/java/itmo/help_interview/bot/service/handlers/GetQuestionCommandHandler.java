@@ -11,7 +11,7 @@ import itmo.help_interview.bot.service.QuestionService;
 import itmo.help_interview.bot.service.TagService;
 import itmo.help_interview.bot.service.TelegramBot;
 import itmo.help_interview.bot.service.UserService;
-import itmo.help_interview.bot.service.handlers.util.RatingConstantsService;
+import itmo.help_interview.bot.service.handlers.util.RatingBanConstantsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -35,7 +35,7 @@ public class GetQuestionCommandHandler implements CommandHandler {
     private final TagService tagService;
     private final UserService userService;
     private final QuestionService questionService;
-    private final RatingConstantsService ratingConstantsService;
+    private final RatingBanConstantsService ratingBanConstantsService;
 
     private static Random rnd = new Random(42);
 
@@ -159,7 +159,7 @@ public class GetQuestionCommandHandler implements CommandHandler {
 
         // Переходим к логике выдаче или снятия рейтинга за ответ
         Tag questionDifficulty = tagService.getDifficultTagFromList(question.getTags());
-        ratingConstantsService.computeNewUserRatingAfterHisAnswer(chatId, isAnswerCorrect, questionDifficulty);
+        ratingBanConstantsService.computeNewUserRatingAfterHisAnswer(chatId, isAnswerCorrect, questionDifficulty);
     }
 
 	private String generateQuestionFullTextFromQuestionId(Long questionId) {

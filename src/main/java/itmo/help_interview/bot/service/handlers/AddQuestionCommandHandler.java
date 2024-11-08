@@ -9,7 +9,6 @@ import itmo.help_interview.bot.entity.Answer;
 import itmo.help_interview.bot.entity.Question;
 import itmo.help_interview.bot.entity.Tag;
 import itmo.help_interview.bot.entity.TagCategory;
-import itmo.help_interview.bot.entity.User;
 import itmo.help_interview.bot.repository.TagRepository;
 import itmo.help_interview.bot.service.CommandHandler;
 import itmo.help_interview.bot.service.QuestionService;
@@ -17,7 +16,7 @@ import itmo.help_interview.bot.service.TagService;
 import itmo.help_interview.bot.service.TelegramBot;
 import itmo.help_interview.bot.service.handlers.util.NewQuestionContext;
 import itmo.help_interview.bot.service.handlers.util.NewQuestionContextState;
-import itmo.help_interview.bot.service.handlers.util.RatingConstantsService;
+import itmo.help_interview.bot.service.handlers.util.RatingBanConstantsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -37,7 +36,7 @@ public class AddQuestionCommandHandler implements CommandHandler {
     private final Map<Long, NewQuestionContext> userTONewQuestionContext = new HashMap<>();
     private final TagService tagService;
     private final QuestionService questionService;
-    private final RatingConstantsService ratingConstantsService;
+    private final RatingBanConstantsService ratingBanConstantsService;
 
     @Override
     public String getCommandName() {
@@ -49,11 +48,20 @@ public class AddQuestionCommandHandler implements CommandHandler {
     public void handle(TelegramBot bot, Update update) {
         long chatId = update.getMessage().getChatId();
 
-        // Выкидываем ошибку пользователю если он не создавать вопросы (из-за рейтинга)
-        if (!ratingConstantsService.userAllowToCreateQuestions(chatId)) {
+        // Выкидываем ошибку пользователю если он не создавать вопросы (из-за рейтинга или он забанен)
+        if (ratingBanConstantsService.isUserBanned(chatId)) {
+            bot.send(chatId, "Вы забанены и не можете добавлять вопросы. Однако, вы можете " +
+                    "пользоваться системой и отвечать на вопросы.");
+            // Удалили контекст вопроса если он был
+            userTONewQuestionContext.remove(chatId);
+            return;
+        }
+        if (!ratingBanConstantsService.userAllowToCreateQuestions(chatId)) {
             bot.send(chatId, "У вас недостаточно рейтинга для создания вопросов. " +
-                    "Необходимо рейтинга " + RatingConstantsService.QUESTION_MAKER_RATING +
+                    "Необходимо рейтинга " + RatingBanConstantsService.QUESTION_MAKER_RATING +
                     ". Свой рейтинг можно проверить по команде /about_me");
+            // Удалили контекст вопроса если он был
+            //userTONewQuestionContext.remove(chatId);
             return;
         }
 
@@ -100,20 +108,30 @@ public class AddQuestionCommandHandler implements CommandHandler {
         long chatId = callbackQuery.getMessage().getChatId();
         int messageId = callbackQuery.getMessage().getMessageId();
 
-        // Выкидываем ошибку пользователю если он не создавать вопросы (из-за рейтинга)
-        if (!ratingConstantsService.userAllowToCreateQuestions(chatId)) {
-            String notEnoughRatingForQuestionsAnswer = "У вас недостаточно рейтинга для создания вопросов. " +
-                    "Необходимо рейтинга " + RatingConstantsService.QUESTION_MAKER_RATING +
-                    ". Свой рейтинг можно проверить по команде /about_me";
-            bot.sendEditMessage(chatId, notEnoughRatingForQuestionsAnswer, messageId);
-            return;
-        }
-
         // Ecли оказалось, что контекст удалился за время колбэка, то менять сообщение с кнопкой на информацию об этом.
         if (!userTONewQuestionContext.containsKey(chatId)) {
             bot.sendEditMessage(chatId, "Процесс создания нового вопроса был отменён или уже закончен", messageId);
             return;
         }
+
+        // Выкидываем ошибку пользователю если он не создавать вопросы (из-за рейтинга)
+        if (ratingBanConstantsService.isUserBanned(chatId)) {
+            bot.send(chatId, "Вы забанены и не можете добавлять вопросы. Однако, вы можете " +
+                    "пользоваться системой и отвечать на вопросы.");
+            // Удалили контекст вопроса если он был
+            userTONewQuestionContext.remove(chatId);
+            return;
+        }
+        if (!ratingBanConstantsService.userAllowToCreateQuestions(chatId)) {
+            String notEnoughRatingForQuestionsAnswer = "У вас недостаточно рейтинга для создания вопросов. " +
+                    "Необходимо рейтинга " + RatingBanConstantsService.QUESTION_MAKER_RATING +
+                    ". Свой рейтинг можно проверить по команде /about_me";
+            // Удалили контекст вопроса если он был
+            //userTONewQuestionContext.remove(chatId);
+            bot.sendEditMessage(chatId, notEnoughRatingForQuestionsAnswer, messageId);
+            return;
+        }
+
 
         NewQuestionContext currentUserContext = userTONewQuestionContext.get(chatId);
         Question question = currentUserContext.getQuestion();
@@ -402,7 +420,25 @@ public class AddQuestionCommandHandler implements CommandHandler {
         long chatId = update.getMessage().getChatId();
         if (!userTONewQuestionContext.containsKey(chatId)) {
             // TODO Возврат ошибки о том, что случайно оказалось, что контекст не найден и для создания вопроса
-            // TODO необходимо снова выполнить /add_question
+            // TODO необходимо снова выполнить /add_question НО ВООБЩЕ ТАКОГО БЫТЬ НЕ ДОЛЖНО
+            return;
+        }
+
+        // Выкидываем ошибку пользователю если он не создавать вопросы (из-за рейтинга)
+        if (ratingBanConstantsService.isUserBanned(chatId)) {
+            bot.send(chatId, "Вы забанены и не можете добавлять вопросы. Однако, вы можете " +
+                    "пользоваться системой и отвечать на вопросы.");
+            // Удалили контекст вопроса если он был
+            userTONewQuestionContext.remove(chatId);
+            return;
+        }
+        if (!ratingBanConstantsService.userAllowToCreateQuestions(chatId)) {
+            String notEnoughRatingForQuestionsAnswer = "У вас недостаточно рейтинга для создания вопросов. " +
+                    "Необходимо рейтинга " + RatingBanConstantsService.QUESTION_MAKER_RATING +
+                    ". Свой рейтинг можно проверить по команде /about_me";
+            // Удалили контекст вопроса если он был
+            // userTONewQuestionContext.remove(chatId);
+            bot.send(chatId, notEnoughRatingForQuestionsAnswer);
             return;
         }
 

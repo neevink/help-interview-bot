@@ -8,11 +8,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class RatingConstantsService {
+public class RatingBanConstantsService {
 	public static int MODERATION_RATING = 50;
 	public static int QUESTION_MAKER_RATING = 20;
 
 	private final UserService userService;
+
+	public boolean isUserBanned(long chatId) {
+		return userService.getUserById(chatId).isBanned();
+	}
 
 	public boolean userAllowToCreateQuestions(long chatId) {
 		return userService.getUserById(chatId).getRating() > QUESTION_MAKER_RATING;
