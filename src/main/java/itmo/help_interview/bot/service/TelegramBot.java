@@ -9,6 +9,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Component
@@ -55,6 +56,17 @@ public class TelegramBot extends TelegramLongPollingBot {
 		}
 	}
 
+	public void send(long chatId, String textToSend, InlineKeyboardMarkup markup) {
+		SendMessage sendMessage = new SendMessage();
+		sendMessage.setChatId(String.valueOf(chatId));
+		sendMessage.setText(textToSend);
+		sendMessage.setReplyMarkup(markup);
+		try {
+			execute(sendMessage);
+		} catch (TelegramApiException ignored) {
+		}
+	}
+
 	public void send(long chatId, String textToSend) {
 		SendMessage sendMessage = new SendMessage();
 		sendMessage.setChatId(String.valueOf(chatId));
@@ -68,6 +80,17 @@ public class TelegramBot extends TelegramLongPollingBot {
 	public void send(SendMessage sendMessage) {
 		try {
 			execute(sendMessage);
+		} catch (TelegramApiException ignored) {
+		}
+	}
+
+	public void sendEditMessage(long chatId, String textToSend, int messageId) {
+		EditMessageText editMessage = new EditMessageText();
+		editMessage.setChatId(chatId);
+		editMessage.setMessageId(messageId);
+		editMessage.setText(textToSend);
+		try {
+			execute(editMessage);
 		} catch (TelegramApiException ignored) {
 		}
 	}

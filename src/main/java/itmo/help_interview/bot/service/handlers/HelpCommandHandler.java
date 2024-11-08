@@ -22,7 +22,7 @@ public class HelpCommandHandler implements CommandHandler {
                 "\n/settings — настройка фильтра вопросов" +
                 "\n/get_question — получить следующий вопрос по подготовке к интервью" +
                 "\n/add_question — создать новый вопрос" +
-                "\n/my_questions — посмотреть все созданные вопросы";
+                "\n/about_me — посмотреть информацию о себе и свой рейтинг";
         bot.send(chatId, textToSend);
     }
 

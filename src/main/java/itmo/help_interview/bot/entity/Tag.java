@@ -9,6 +9,8 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.util.Objects;
 
@@ -24,6 +26,7 @@ public class Tag {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "category", nullable = false)
+	@JdbcType(PostgreSQLEnumJdbcType.class)
 	private TagCategory category;
 
 	@Column(name = "name", nullable = false)
