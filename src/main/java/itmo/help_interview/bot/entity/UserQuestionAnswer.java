@@ -14,6 +14,9 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.Type;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 @Data
 @AllArgsConstructor
@@ -38,7 +41,16 @@ public class UserQuestionAnswer {
 	private Boolean isTrue = false;
 
 	@Enumerated(EnumType.STRING)
-	@Column(name = "reaction", nullable = false)
+	@Column(name = "reaction")
+	@JdbcType(PostgreSQLEnumJdbcType.class)
 	private UserQuestionAnswerReaction reaction;
+
+	public Long getUserId() {
+		return user.getChatId();
+	}
+
+	public Long getQuestionId() {
+		return question.getId();
+	}
 
 }

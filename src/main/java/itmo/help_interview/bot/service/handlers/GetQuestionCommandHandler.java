@@ -3,9 +3,14 @@ package itmo.help_interview.bot.service.handlers;
 import itmo.help_interview.bot.entity.Answer;
 import itmo.help_interview.bot.entity.Question;
 import itmo.help_interview.bot.entity.Tag;
+import itmo.help_interview.bot.entity.User;
+import itmo.help_interview.bot.entity.UserQuestionAnswer;
+import itmo.help_interview.bot.entity.UserQuestionAnswerReaction;
 import itmo.help_interview.bot.exceptions.NotEvenSinglePotentialQuestionForUserException;
 import itmo.help_interview.bot.exceptions.SettingsNotDefinedYetException;
 import itmo.help_interview.bot.exceptions.UserNotFoundException;
+import itmo.help_interview.bot.repository.TagRepository;
+import itmo.help_interview.bot.repository.UserQuestionAnswerRepository;
 import itmo.help_interview.bot.service.CommandHandler;
 import itmo.help_interview.bot.service.QuestionService;
 import itmo.help_interview.bot.service.TagService;
@@ -21,8 +26,11 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Обработка команды получения вопроса /get_question
@@ -38,6 +46,8 @@ public class GetQuestionCommandHandler implements CommandHandler {
     private final RatingBanConstantsService ratingBanConstantsService;
 
     private static Random rnd = new Random(42);
+    private final UserQuestionAnswerRepository userQuestionAnswerRepository;
+    private final TagRepository tagRepository;
 
     @Override
     public void handle(TelegramBot bot, Update update) {
@@ -104,6 +114,15 @@ public class GetQuestionCommandHandler implements CommandHandler {
 
         // Получение всех подходящих вопросов
         List<Question> potentialQuestions = questionService.getAllQuestionsContainsBothTags(difficultUserTag, languageUserTag);
+        // Получение вопросов, на которые юзер ещё не отвечал ВООБЩЕ
+        // TODO подумать про то, можно ли возвращать вопросы, на которые юзер ответил неверно когда-то...
+        Set<Long> viewedQuestionIds = userQuestionAnswerRepository.findAllByUser_chatId(chatId).stream()
+                .map(UserQuestionAnswer::getQuestionId)
+                .collect(Collectors.toSet());
+        potentialQuestions = potentialQuestions.stream()
+                .filter(question -> !viewedQuestionIds.contains(question.getId()))
+                .toList();
+
         if (potentialQuestions.isEmpty()) {
             // Не нашлось подходящих запросов, измените предпочтения
             throw new NotEvenSinglePotentialQuestionForUserException(
@@ -111,11 +130,8 @@ public class GetQuestionCommandHandler implements CommandHandler {
                             " и сложности " + difficultUserTag.getName() +
                             " не нашлось (новых) вопросов для Вас");
         }
-
         // Выборка рандомного из них
-        // TODO: допилить сюда получение вопросов, на которые юзер ещё не отвечал верно
         return potentialQuestions.get(rnd.nextInt(potentialQuestions.size()));
-
     }
 
     @Override
@@ -160,6 +176,15 @@ public class GetQuestionCommandHandler implements CommandHandler {
         // Переходим к логике выдаче или снятия рейтинга за ответ
         Tag questionDifficulty = tagService.getDifficultTagFromList(question.getTags());
         ratingBanConstantsService.computeNewUserRatingAfterHisAnswer(chatId, isAnswerCorrect, questionDifficulty);
+        // Заполняем связь о том, что пользователь просматривал данный вопрос и дал на него некоторый ответ
+        User user = userService.getUserById(chatId);
+        userQuestionAnswerRepository.save(new UserQuestionAnswer(
+                null,
+                user,
+                question,
+                isAnswerCorrect,
+                null
+        ));
     }
 
 	private String generateQuestionFullTextFromQuestionId(Long questionId) {
